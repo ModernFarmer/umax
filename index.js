@@ -15,7 +15,7 @@ if(!HTMLCanvasElement.prototype.toBlob){    // 如果canvas对象没有toBlob方
     });
 }
     
-let umax=(function(BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOBE_ENCODED, TEMPORARY, __BEFORE, __REQEUST, __CHECK_RESPONSED){
+export default (function(BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOBE_ENCODED, TEMPORARY, __BEFORE, __REQEUST, __CHECK_RESPONSED){
     class ___UM_ajax{
         constructor(){
             /*this.config={  // ajax的全局配置
