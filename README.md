@@ -44,7 +44,7 @@ umax._compress(json)  --- 压缩file
 
 **使用:**
 
-**`1: umax.init()`**
+****`1: umax.init()`****
 
 **.init()　　初始化umax对象的基础参数, 设置umax的全局配置(这个方法在执行了一次之后会自动被注销)**
 
