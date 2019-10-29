@@ -44,20 +44,23 @@ umax._compress(json)  --- 压缩file
 
 **使用:**
 
-***api***
+**1:　.init()方法**
 
-```javascript
-
-```
-
-**1:　.select()方法**
-
-**.select()　　同步执行指定的mysql 查询语句 ( SELECT语句 )**
+**.init()　　初始化umax对象的基础参数, 设置umax的全局配置(这个方法在执行了一次之后会自动被注销)**
 
 　参数 :<br>
-　　**.select**( *sql*,　*arr* )<br>
-　　`sql:　要执行的mysql语句　　　　　　　　必须`<br>
-　　`arr:　防注入操作存放数据的数组　　　　可选`<br>
+　　**.init**( *json* )<br>
+　　`json:　初始化参数　　　　　　　　必须`<br>
+　　　　`json: {`<br>
+　　　　　　baseUrl: [string],　　　　　　　设置基础访问地址 <必须>
+　　　　　　timeout: [number],　　　　　　　设置最长响应时间 [可选]
+　　　　　　ontimeout: [function],　　　　　设置超过最长响应时间后的回调函数 [可选] (该函数自带固定参数: XMLHttpRequest对象)
+　　　　　　responseType: [string],　　　　设置返回的数据类型 [可选]
+　　　　　　headers: [json],　　　　　　　　设置请求头 [可选]
+　　　　　　onprogress: [function],　　　　设置下载进度执行函数 [可选] (自带固定参数: ProgressEvent对象, 它的.loaded属性代表已经完成发送部分的文件大小[number])
+　　　　　　user: [string],　　　　　　　　　设置服务器验证账号 [可选]
+　　　　　　password: [string]　　　　　　　设置服务器验证密码 [可选]
+　　　　`}`<br>
 
 **基础案例 :**
 ```javascript
