@@ -52,14 +52,14 @@ umax._compress(json)  --- 压缩file
 　　**.init**( *json* )<br>
 　　`json:　初始化参数　　　　　　　　必须`<br>
 　　　　`json: {`<br>
-　　　　　　baseUrl: [string],　　　　　　　设置基础访问地址 <必须>
-　　　　　　timeout: [number],　　　　　　　设置最长响应时间 [可选]
-　　　　　　ontimeout: [function],　　　　　设置超过最长响应时间后的回调函数 [可选] (该函数自带固定参数: XMLHttpRequest对象)
-　　　　　　responseType: [string],　　　　设置返回的数据类型 [可选]
-　　　　　　headers: [json],　　　　　　　　设置请求头 [可选]
-　　　　　　onprogress: [function],　　　　设置下载进度执行函数 [可选] (自带固定参数: ProgressEvent对象, 它的.loaded属性代表已经完成发送部分的文件大小[number])
-　　　　　　user: [string],　　　　　　　　　设置服务器验证账号 [可选]
-　　　　　　password: [string]　　　　　　　设置服务器验证密码 [可选]
+　　　　　　`baseUrl: [string],　　　　　　　设置基础访问地址 <必须>`<br>
+　　　　　　`timeout: [number],　　　　　　　设置最长响应时间 [可选]`<br>
+　　　　　　`ontimeout: [function],　　　　　设置超过最长响应时间后的回调函数 [可选] (该函数自带固定参数: XMLHttpRequest对象)`<br>
+　　　　　　`responseType: [string],　　　　设置返回的数据类型 [可选]`<br>
+　　　　　　`headers: [json],　　　　　　　　设置请求头 [可选]`<br>
+　　　　　　`onprogress: [function],　　　　设置下载进度执行函数 [可选] (自带固定参数: ProgressEvent对象, 它的.loaded属性代表已经完成发送部分的文件大小[number])`<br>
+　　　　　　`user: [string],　　　　　　　　　设置服务器验证账号 [可选]`<br>
+　　　　　　`password: [string]　　　　　　　设置服务器验证密码 [可选]`<br>
 　　　　`}`<br>
 
 **基础案例 :**
