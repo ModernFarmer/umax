@@ -44,7 +44,7 @@ umax._compress(json)  --- 压缩file
 
 **使用:**
 
-1: umax.init()
+1:  `umax.init()`
 ------
 
 **.init()　　初始化umax对象的基础参数, 设置umax的全局配置(这个方法在执行了一次之后会自动被注销)**
@@ -85,7 +85,8 @@ umax.init({
 });
 ```
 
-**`2: umax.fixed`**
+2:  `umax.fixed`
+------
 
 **.fixed　　全局设置每次调取接口都需要上传的固定参数, 如果设置该属性,必须设置成一个json**
 
@@ -102,7 +103,8 @@ umax.fixed={
 }
 ```
 
-**`3: umax.beforeRequest`**
+3:  `umax.beforeRequest`
+------
 
 **.beforeRequest　　全局设置每次调取接口前都执行的拦截, 如果设置该属性,必须设置成一个function**
 
@@ -127,7 +129,8 @@ umax.beforeRequest=function(config){
 };
 ```
 
-**`4: umax.responsed`**
+4:  `umax.responsed`
+------
 
 **.responsed　　全局设置每次调取接口前都执行的拦截, 如果设置该属性,必须设置成一个function**
 
@@ -152,7 +155,8 @@ umax.responsed=function(config){
 };
 ```
 
-**`5: umax.set()`**
+5:  `umax.set()`
+------
 
 **.set()　　设置一次性接口调用的基础参数, 返回umax对象本身**
 
