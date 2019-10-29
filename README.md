@@ -64,6 +64,23 @@ umax._compress(json)  --- 压缩file
 
 **基础案例 :**
 ```javascript
-
+umax.init({
+  baseUrl:'http://localhost:8080',
+  timeout:10000,
+  ontimeout:function(xmlObj){
+    console.log(xmlObj.statusText)
+  },
+  responseType:'text',
+  headers:{
+    connection:'keep-alive',
+    Keep-Alive:'timeout=20, max=2',
+    ...
+  },
+  onprogress:function(e){
+    console.log(e.loaded/e.total);
+  },
+  user:'userName',
+  password:'userPwd'
+});
 ```
 
