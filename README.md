@@ -19,7 +19,7 @@ import umax from 'umax'
 ```javascript
 umax.fixed  --- 全局设置每次调取接口都需要上传的固定参数, [可选] 如果设置该属性,必须设置成一个json
 umax.beforeRequest  --- 全局设置每次调取接口前都执行的拦截, [可选] 如果设置该属性, 必须设置成一个function
-umax.responsed  --- 全局设置每次调取接口完成后都会执行的函数, [可选] 如果设置该属性, 必须设置成一个function
+umax.responsed  --- 全局设置每次服务器成功返回后都会执行的函数, [可选] 如果设置该属性, 必须设置成一个function
 
 umax.init(json)  --- 初始化umax对象的基础参数, <必须> *这个方法只能执行一次, 执行完之后会被自动注销
 
@@ -51,9 +51,10 @@ umax._compress(json)  --- 压缩file
 
 　参数 :<br>
 　　**.init**( *json* )<br>
-　　`json:　初始化参数　　必须`<br>
+　　　　*在调用umax对象其它方法之前必须先执行该方法来初始化对象的基础配置<br>
+　　`json:　初始化参数　　可选`<br>
 　　　　`json: {`<br>
-　　　　　　`baseUrl: [string],　　　　　　　设置基础访问地址 <必须>`<br>
+　　　　　　`baseUrl: [string],　　　　　　　设置基础访问地址 [可选] 默认为''`<br>
 　　　　　　`timeout: [number],　　　　　　　设置最长响应时间 [可选]`<br>
 　　　　　　`ontimeout: [function],　　　　　设置超过最长响应时间后的回调函数 [可选] (该函数自带固定参数: XMLHttpRequest对象)`<br>
 　　　　　　`responseType: [string],　　　　设置返回的数据类型 [可选]`<br>
@@ -65,24 +66,29 @@ umax._compress(json)  --- 压缩file
 
 **基础案例 :**
 ```javascript
-umax.init({
-  baseUrl:'http://localhost:8080',
-  timeout:10000,
-  ontimeout:function(xmlObj){
+umax.init({ // .init()方法能接收的json有效字段有:baseUrl、timeout、ontimeout、responseType、headers、onprogress、user、password
+  baseUrl:'http://localhost:8080',  // 基础地址  默认''
+  timeout:10000,  // 最长响应时间(单位:ms)  默认0(无限)
+  ontimeout:function(xmlObj){  // 超过最长响应时间后执行的响应事件  默认null
     console.log(xmlObj.statusText)
   },
-  responseType:'text',
-  headers:{
+  responseType:'text',  // 设置接收类型  默认''
+  headers:{  // 设置headers  默认null
     connection:'keep-alive',
     Keep-Alive:'timeout=20, max=2',
     ...
   },
-  onprogress:function(e){
-    console.log(e.loaded/e.total);
+  onprogress:function(e){  // 设置上传进度响应事件  默认null
+    console.log(e.loaded/e.total);  // e.loaded:当前已上传文件大小(单位:b), e.total:当前上传文件的总大小(单位:b)
   },
-  user:'userName',
-  password:'userPwd'
+  user:'userName',  // 设置服务器验证的user  默认null
+  password:'userPwd'  // 设置服务器验证的password  默认null
 });
+
+
+也可以:
+
+umax.init();   // 默认配置, 等同于umax({baseUrl:''});
 ```
 
 2:  `umax.fixed`
@@ -91,8 +97,8 @@ umax.init({
 **.fixed　　全局设置每次调取接口都需要上传的固定参数, 如果设置该属性,必须设置成一个json**
 
 　参数 :<br>
-　　**.fixed** = *json*<br>
-　　`json:　每次调取接口都需要上传的固定参数　　必须`<br>
+　　**.fixed** = *json*  [可选]<br>
+　　`json:　每次调取接口都需要上传的固定参数　　必须 (json配置同.init()方法)`<br>
 
 **基础案例 :**
 ```javascript
@@ -109,16 +115,16 @@ umax.fixed={
 **.beforeRequest　　全局设置每次调取接口前都执行的拦截, 如果设置该属性,必须设置成一个function**
 
 　参数 :<br>
-　　**.beforeRequest** = *function*<br>
+　　**.beforeRequest** = *function*  [可选]<br>
 　　`function:　每次调取接口前都执行的函数　　必须`<br>
-　　　　`该函数自带固定参数config, 它代表umax对象的基础配置`
-　　　　`可以根据条件改变config内的值, 该函数最后必须返回这个config`
+　　　　`该函数自带固定参数*config*, 它代表umax对象的基础配置`<br>
+　　　　`可以根据条件改变*config*内的值, 该函数最后必须返回这个*config*`</br>
 
 **基础案例 :**
 ```javascript
 umax.beforeRequest=function(config){
   // todo ...
-  console.log(config);  // {baseUrl:'http://localhost:8080',timeout:null,ontimeout:null,responseType:'',headers:null,onprogress:null,user:null,password:null}
+  console.log(config);  // {baseUrl:'',timeout:null,ontimeout:null,responseType:'',headers:null,onprogress:null,user:null,password:null}
   if([some conditions]){
     config.baseUrl='http://localhost:8080'; // 可以对config对象进行配置
   }else{
@@ -135,23 +141,15 @@ umax.beforeRequest=function(config){
 **.responsed　　全局设置每次调取接口前都执行的拦截, 如果设置该属性,必须设置成一个function**
 
 　参数 :<br>
-　　**.responsed** = *function*<br>
-　　`function:　每次调取接口前都执行的函数　　必须`<br>
-　　　　`该函数自带固定参数config, 它代表umax对象的基础配置`
-　　　　`可以根据条件改变config内的值, 该函数最后必须返回这个config`
+　　**.responsed** = *function*  [可选]<br>
+　　`function:　每次服务器成功返回后都会执行的函数　　必须`<br>
+　　　　`该函数自带固定参数*data*和*XMLObj*, 它们分别代表服务器返回的数据和XMLHttpRequest对象`
+　　　　`**这里对data进行的处理*不会*影响umax对象最终返回的数据!!!`
 
 **基础案例 :**
 ```javascript
-umax.responsed=function(config){
+umax.responsed=function(data, xmlObj){
   // todo ...
-  console.log(config);  // {baseUrl:'http://localhost:8080',timeout:null,ontimeout:null,responseType:'',headers:null,onprogress:null,user:null,password:null}
-  if([some conditions]){
-    config.baseUrl='http://localhost:8080'; // 可以对config对象进行配置
-  }else{
-    config.baseUrl='http://localhost:9090';
-  };
-
-  return config;  // 必须返回config
 };
 ```
 
@@ -177,7 +175,7 @@ umax.responsed=function(config){
 **基础案例 :**
 ```javascript
 let json={
-  baseUrl:'http://localhost:8080',
+  baseUrl:'http://localhost:8081',
   timeout:10000,
   ontimeout:function(xmlObj){
     console.log(xmlObj.statusText)
