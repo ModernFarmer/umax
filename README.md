@@ -52,14 +52,17 @@ umax._compress(json)  --- 压缩file
 　参数 :<br>
 　　**.init**( *json* )<br>
 　　　　*在调用umax对象其它方法之前必须先执行该方法来初始化对象的基础配置<br>
-　　`json:　初始化参数　　可选`<br>
+　　`json:　初始化参数　[json]　可选`<br>
 　　　　`json: {`<br>
 　　　　　　`baseUrl: [string],　　　　　　　设置基础访问地址 [可选] 默认为''`<br>
 　　　　　　`timeout: [number],　　　　　　　设置最长响应时间 [可选]`<br>
-　　　　　　`ontimeout: [function],　　　　　设置超过最长响应时间后的回调函数 [可选] (该函数自带固定参数: XMLHttpRequest对象)`<br>
+　　　　　　`ontimeout: [function],　　　设置超过最长响应时间后的回调函数 [可选]`<br>
+　　　　　　　　　　　　　　`(该函数自带固定参数: XMLHttpRequest对象)`<br>
 　　　　　　`responseType: [string],　　　　设置返回的数据类型 [可选]`<br>
 　　　　　　`headers: [json],　　　　　　　　设置请求头 [可选]`<br>
-　　　　　　`onprogress: [function],　　　　设置下载进度执行函数 [可选] (自带固定参数: ProgressEvent对象, 它的.loaded属性代表已经完成发送部分的文件大小[number])`<br>
+　　　　　　`onprogress: [function],　　　　设置下载进度执行函数 [可选]`<br>
+　　　　　　　　　　　　　　`(自带固定参数: ProgressEvent对象,`<br>
+　　　　　　　　`它的.loaded属性代表已经完成发送部分的文件大小[number])`<br>
 　　　　　　`user: [string],　　　　　　　　　设置服务器验证账号 [可选]`<br>
 　　　　　　`password: [string]　　　　　　　设置服务器验证密码 [可选]`<br>
 　　　　`}`<br>
@@ -143,8 +146,8 @@ umax.beforeRequest=function(config){
 　参数 :<br>
 　　**.responsed** = *function*  [可选]<br>
 　　`function:　每次服务器成功返回后都会执行的函数　　必须`<br>
-　　　　`该函数自带固定参数*data*和*XMLObj*, 它们分别代表服务器返回的数据和XMLHttpRequest对象`
-　　　　`**这里对data进行的处理*不会*影响umax对象最终返回的数据!!!`
+　　　　`该函数自带固定参数*data*和*XMLObj*, 它们分别代表服务器返回的数据和XMLHttpRequest对象`<br>
+　　　　`**这里对data进行的处理*不会*影响umax对象最终返回的数据!!!`<br>
 
 **基础案例 :**
 ```javascript
@@ -160,17 +163,8 @@ umax.responsed=function(data, xmlObj){
 
 　参数 :<br>
 　　**.set**( *json* )<br>
-　　`json:　初始化参数　　必须`<br>
-　　　　`json: {`<br>
-　　　　　　`baseUrl: [string],　　　　　　　设置基础访问地址 [可选]`<br>
-　　　　　　`timeout: [number],　　　　　　　设置最长响应时间 [可选]`<br>
-　　　　　　`ontimeout: [function],　　　　　设置超过最长响应时间后的回调函数 [可选] (该函数自带固定参数: XMLHttpRequest对象)`<br>
-　　　　　　`responseType: [string],　　　　设置返回的数据类型 [可选]`<br>
-　　　　　　`headers: [json],　　　　　　　　设置请求头 [可选]`<br>
-　　　　　　`onprogress: [function],　　　　设置下载进度执行函数 [可选] (自带固定参数: ProgressEvent对象, 它的.loaded属性代表已经完成发送部分的文件大小[number])`<br>
-　　　　　　`user: [string],　　　　　　　　　设置服务器验证账号 [可选]`<br>
-　　　　　　`password: [string]　　　　　　　设置服务器验证密码 [可选]`<br>
-　　　　`}`<br>
+　　　　.set()方法设置只对`单次`调取接口时有效, `不会`影响全局基础配置config<br>
+　　`json:　初始化参数　[json]　必须 (json配置同.init()方法)`<br>
 
 **基础案例 :**
 ```javascript
@@ -198,4 +192,247 @@ umax.set(json).get('/demo', {id:888888}).then(data=>{ // !!! .set()方法设置�
 }).catch(err=>{
   // todo ...
 });
+```
+
+6:  `umax.get()`
+------
+
+**.get()　　通过get方式调取接口, 返回Promise**
+
+　参数 :<br>
+　　**.get**( *url,* *arg* )<br>
+　　`url:　接口地址　[string]　必须`<br>
+　　`arg:　接口所需参数　[json|string]　可选`<br>
+
+**基础案例 :**
+```javascript
+umax.get('/demo', {id:666, value:'value'}).then(data=>{
+	// todo ...
+}).catch(err=>{
+	// todo ...
+});
+
+也可以:
+
+let data=await umax.get('/demo', 'id=666&value=value').catch(err=>{});  // 在async函数中使用
+
+也可以:
+
+let data=await umax.get('/demo?id=666&value=value').catch(err=>{});
+
+**注: url参数头上的'/'可以写也可以不写, 所以你可以这样调用接口:
+
+umax.get('demo/list').then(data=>{});  // 等同于umax.get('/demo/list').then(data=>{});
+```
+
+7:  `umax.post()`
+------
+
+**.post()　　通过post方式调取接口, 返回Promise**
+
+　参数 :<br>
+　　**.post**( *url,* *arg* )<br>
+　　`url:　接口地址　[string]　必须`<br>
+　　`arg:　接口所需参数　[json|string]　可选`<br>
+　　　　**.post()方法的第二个参数可接收 `json字符串` 或者 `array字符串`,**<br>
+　　　　**方法内部会自动将contentType设置成'aplication/json', 而不用手动去设置**<br>
+
+**基础案例 :**
+```javascript
+let json={id:666, value:'value'};
+
+umax.post('/demo', json).then(data=>{
+	// todo ...
+}).catch(err=>{
+	// todo ...
+});
+
+也可以:
+
+umax.post('/demo', JSON.stringify(json)).then(data=>{
+	// todo ...
+}).catch(err=>{
+	// todo ...
+});
+
+也可以:
+
+let data=await umax.post('/demo', 'id=666&value=value').catch(err=>{});  // 在async函数中使用
+
+**注: url参数头上的'/'可以写也可以不写, 所以你可以这样调用接口:
+
+umax.post('demo/list').then(data=>{});  // 等同于umax.post('/demo/list').then(data=>{});
+```
+
+8:  `umax.form()`
+------
+
+**.form()　　简单地通过FormData向服务器发送文件, 返回Promise**
+
+　参数 :<br>
+　　**.form**( *url,* *arg* )<br>
+　　`url:　接口地址　[string]　必须`<br>
+　　`arg:　接口所需参数　[json]　必须`<br>
+　　　　`arg: {`<br>
+　　　　　　`fieldName: [string], <必须>  传给后台的文件数据字段名`<br>
+　　　　　　`files: [file|blob|array|json|HTMLInputElement],　<必须>　要发送的文件, 参考基础案例`<br>
+　　　　　　`data: [json]   [可选]　　要发送的普通数据`<br>
+　　　　`}`<br>
+
+**基础案例 :**
+```javascript
+<html>
+<input type="file" id="fileElement_1"/>
+<input type="file" id="fileElement_2"/>
+</html>
+
+<script>
+fileElement_1.onchange=async function(){
+	let files=fileElement_1.files;
+	// 下面虚拟两条blob数据...
+	let blob1=这里是虚拟的Blob数据;
+	let blob2=这里是虚拟的Blob数据;
+
+	umax.form('/demo', {
+		fieldName:'file',
+		// files可接收参数: ↓↓↓↓↓↓
+		files:files[0],  // 接收File
+		files:umax._base64ToBlob(await umax._toBase64(files[0])),  // 接收Blob
+		files:fileElement_1,  // 接收h5的input[type=file]元素, 将会把fileElement_1元素上所有的文件都发送
+		files:{name:'name_1', file:files[0]}, // 接收{name:'name', file:file}数据, 如果files参数是一个json, umax对象会先判断name in json和file in json, 如果有, 则会像这样给后台发送文件:new FormData(fieldName, json.file, json.name), *这样只能发送一个文件*
+		files:{'name_1.jpg':files[0], 'name_2.jpg':files[1]}, // 接收{name:file}数据, 如果files参数是一个json, 且没有name和file键名, 那么会像这样给后台发送文件:new FormData(fieldName, keyOfjson, json[keyOfjson]), *这样可以发送多个文件*
+		files:[blob1, blob2],  // 接收[Blob, Blob, ...]
+		files:[fileElement_1, fileElement_2],  // 接收[HTMLInputElement, HTMLInputElement, ...], 将会把数组内所有元素上所有input[type=file]的文件都发送
+		files:[...files],  // 接收[File, File, ...], 这里要特别注意, files不是array, 要先将其转换成array才能被方法接收
+		files:[{name:'name_1', file:files[0]}, {name:'name_2', file:files[1]}], // 接收[Json, Json, ...]
+		// files可接收参数: ↑↑↑↑↑↑
+		data:{
+			key1:'value1',
+			key2:'value2',
+			...
+		}
+	}).then(data=>{
+		// todo ...
+	}).catch(err=>{
+		// todo ...
+	});
+};
+</script>
+
+**注: url参数头上的'/'可以写也可以不写, 所以你可以这样调用接口:
+
+umax.form('demo/list', {...}).then(data=>{...});  // 等同于umax.form('/demo/list', {...}).then(data=>{...});
+```
+
+9:  `umax.put()`
+------
+
+**.put()　　通过put方式调取接口, 返回Promise**
+
+　参数 :<br>
+　　**.put**( *url,* *arg* )<br>
+　　`url:　接口地址　[string]　必须`<br>
+　　`arg:　接口所需参数　[json|string]　可选`<br>
+　　　　**.put()方法的第二个参数可接收 `json字符串` 或者 `array字符串`,**<br>
+　　　　**方法内部会自动将contentType设置成'aplication/json', 而不用手动去设置**<br>
+
+**基础案例 :**
+```javascript
+**用法与umax.post()方法相同
+```
+
+10:  `umax.patch()`
+------
+
+**.patch()　　通过patch方式调取接口, 返回Promise**
+
+　参数 :<br>
+　　**.patch**( *url,* *arg* )<br>
+　　`url:　接口地址　[string]　必须`<br>
+　　`arg:　接口所需参数　[json|string]　可选`<br>
+　　　　**.patch()方法的第二个参数可接收 `json字符串` 或者 `array字符串`,**<br>
+　　　　**方法内部会自动将contentType设置成'aplication/json', 而不用手动去设置**<br>
+
+**基础案例 :**
+```javascript
+**用法与umax.post()方法相同
+```
+
+11:  `umax.delete()`
+------
+
+**.delete()　　通过delete方式调取接口, 返回Promise**
+
+　参数 :<br>
+　　**.delete**( *url,* *arg* )<br>
+　　`url:　接口地址　[string]　必须`<br>
+　　`arg:　接口所需参数　[json|string]　可选`<br>
+　　　　**.delete()方法的第二个参数可接收 `json字符串` 或者 `array字符串`,**<br>
+　　　　**方法内部会自动将contentType设置成'aplication/json', 而不用手动去设置**<br>
+
+**基础案例 :**
+```javascript
+**用法与umax.post()方法相同
+```
+
+12:  `umax.options()`
+------
+
+**.options()　　通过options方式调取接口, 返回Promise**
+
+　参数 :<br>
+　　**.options**( *url* )<br>
+　　`url:　接口地址　[string]　必须`<br>
+
+**基础案例 :**
+```javascript
+umax.options('/demo').then(data=>{
+	console.log(data);
+	/*
+	***注: .options()方法返回将返回固定格式的数据: ↓↓↓↓↓↓
+	{
+		"headers":"content-type: text/plain; charset=utf-8\r\n",
+		"statusText":"OK",
+		"status":200,
+		"responseURL":"http://localhost:8888/demo"
+	}
+	*/
+}).catch(err=>{
+	// todo ...
+});
+
+**注: url参数头上的'/'可以写也可以不写, 所以你可以这样调用接口:
+
+umax.options('demo/list').then(data=>{});  // 等同于umax.options('/demo/list').then(data=>{});
+```
+
+13:  `umax.head()`
+------
+
+**.head()　　通过head方式调取接口, 返回Promise**
+
+　参数 :<br>
+　　**.head**( *url* )<br>
+　　`url:　接口地址　[string]　必须`<br>
+
+**基础案例 :**
+```javascript
+umax.head('/demo').then(data=>{
+	console.log(data);
+	/*
+	***注: .head()方法返回将返回固定格式的数据: ↓↓↓↓↓↓
+	{
+		"headers":"content-type: text/plain; charset=utf-8\r\n",
+		"statusText":"OK",
+		"status":200,
+		"responseURL":"http://localhost:8888/demo"
+	}
+	*/
+}).catch(err=>{
+	// todo ...
+});
+
+**注: url参数头上的'/'可以写也可以不写, 所以你可以这样调用接口:
+
+umax.head('demo/list').then(data=>{});  // 等同于umax.head('/demo/list').then(data=>{});
 ```
