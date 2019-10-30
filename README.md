@@ -305,6 +305,7 @@ fileElement_1.onchange=async function(){
 		files:[fileElement_1, fileElement_2],  // 接收[HTMLInputElement, HTMLInputElement, ...], 将会把数组内所有元素上所有input[type=file]的文件都发送
 		files:[...files],  // 接收[File, File, ...], 这里要特别注意, files不是array, 要先将其转换成array才能被方法接收
 		files:[{name:'name_1', file:files[0]}, {name:'name_2', file:files[1]}], // 接收[Json, Json, ...]
+			// ***特别注意: 如果files接收的是一个数组, 那么该数组内的值的类型必须保持一致, 不能混搭. 不能像这样传值 -> files:[{name:'a', file:File}, File]
 		// files可接收参数: ↑↑↑↑↑↑
 		data:{
 			key1:'value1',
@@ -435,4 +436,199 @@ umax.head('/demo').then(data=>{
 **注: url参数头上的'/'可以写也可以不写, 所以你可以这样调用接口:
 
 umax.head('demo/list').then(data=>{});  // 等同于umax.head('/demo/list').then(data=>{});
+```
+
+14:  `umax._isJson()`
+------
+
+**._isJson()　　判断一个元素是否是json, 返回boolean**
+
+　参数 :<br>
+　　**._isJson**( *anything* )<br>
+　　`anything:　要判断的元素　[any]　必须`<br>
+
+**基础案例 :**
+```javascript
+console.log(umax._isJson({a:'a', b:'b'}));  // true
+console.log(umax._isJson(['a', 'b'])); // false
+```
+
+15:  `umax._isBase64()`
+------
+
+**._isBase64()　　判断一个字符串是否是base64字符串, 返回boolean**
+
+　参数 :<br>
+　　**._isBase64**( *str* )<br>
+　　`str:　要判断的字符串　[string]　必须`<br>
+
+**基础案例 :**
+```javascript
+let str='abcdefg';
+
+console.log(umax._isBase64(str));  // false
+```
+
+16:  `umax._toBase64()`
+------
+
+**._toBase64()　　将file或者blob转换成base64字符串, 返回Promise**
+
+　参数 :<br>
+　　**._toBase64**( *arg* )<br>
+　　`arg:　要转换的file或者blob　[file|blob]　必须`<br>
+
+**基础案例 :**
+```javascript
+<html>
+<input type="file" id="fileElement"/>
+</html>
+
+<script>
+fileElement.onchange=async function(){
+	let base64='';
+	if(fileElement.files.length>0){
+		base64=await umax._toBase64(fileElement.files[0]);
+	}
+
+	if(umax._isBase64(base64)){
+		console.log(typeof base64); // string
+		alert('Oh, Yes!');
+	}else{
+		alert('Oh, No!');
+	}
+};
+</script>
+```
+
+17:  `umax._base64ToBlob()`
+------
+
+**._base64ToBlob()　　将base64字符串转换成blob, 返回blob**
+
+　参数 :<br>
+　　**._base64ToBlob**( *str* )<br>
+　　`str:　要转换的base64字符串　[string]　必须`<br>
+
+**基础案例 :**
+```javascript
+<html>
+<input type="file" id="fileElement"/>
+</html>
+
+<script>
+fileElement.onchange=async function(){
+	let base64='';
+	if(fileElement.files.length>0){
+		base64=await umax._toBase64(fileElement.files[0]);
+	}
+
+	if(umax._isBase64(base64)){
+		let blob=umax._base64ToBlob(base64);
+		
+		umax.form('/demo/form', {fieldName:'blob', files:blob}).catch(()=>{
+			alert('Oh, No!');
+		});
+	}else{
+		alert('Oh, No!');
+	}
+};
+</script>
+```
+
+18:  `umax._base64ToFile()`
+------
+
+**._base64ToFile()　　将base64字符串转换成file, 返回file**
+
+　参数 :<br>
+　　**._base64ToFile**( *str* )<br>
+　　`str:　要转换的base64字符串　[string]　必须`<br>
+
+**基础案例 :**
+```javascript
+<html>
+<input type="file" id="fileElement"/>
+</html>
+
+<script>
+fileElement.onchange=async function(){
+	let base64='';
+	if(fileElement.files.length>0){
+		base64=await umax._toBase64(fileElement.files[0]);
+	}
+
+	if(umax._isBase64(base64)){
+		let file=umax._base64ToBlob(base64);
+		
+		umax.form('/demo/form', {fieldName:'file', files:file}).catch(()=>{  // 这只是做个试验, 请不要当真... 如果要发送文件, 直接发送fileElement.files[0]即可
+			alert('Oh, No!');
+		});
+	}else{
+		alert('Oh, No!');
+	}
+};
+</script>
+```
+
+19:  `umax._compress()`
+------
+
+**._compress()　　压缩一个或者多个图片文件, 返回Promise**
+
+　参数 :<br>
+　　**._compress**( *json* )<br>
+　　`json:　压缩的相关数据　[json]　必须`<br>
+　　　　`json: {`<br>
+　　　　　　`file: [file|array],　　要压缩的文件或者文件数组 <必须> 默认为''`<br>
+　　　　　　`maxWidth: [number],　　设置压缩后的最大宽度 [可选] 默认为null`<br>
+　　　　　　`maxHeight: [number],　　设置压缩后的最大高度 [可选] 默认为null`<br>
+　　　　　　`quality: [number],　　设置压缩后的图片质量 [可选] 默认为1(不压缩)`<br>
+　　　　　　`type: [string],　　设置压缩后的图片格式 [可选] 默认为'image/jpeg'`<br>
+　　　　`}`<br>
+　　　　**file参数可以接收单个File文件或者一个File文件数组**<br>
+　　　　**如果file参数是一个File文件, ._compress()方法将会返回一个Blob**<br>
+　　　　**如果file参数是一个File文件数组, ._compress()方法将会按照File文件数组的顺序返回一个Blob数组**<br>
+　　　　**一般情况下maxWidth和maxHeight只要设置一个就好, 设置了一个之后, 另一个会根据原图比例自动调整**<br>
+　　　　**如果同时设置了maxWidth和maxHeight, maxWidth的优先级要高于maxHeight**<br>
+　　　　**quality的有效值为0-1(不包括0, 但包括1)**<br>
+　　　　**如果设置了有效quality, type参数将会失效, 返回的实际type固定为'image/jpeg'**<br>
+**基础案例 :**
+```javascript
+<html>
+<input type="file" multiple id="fileElement"/>
+</html>
+
+<script>
+fileElement.onchange=async function(){
+	let files=[...fileElement.files];
+	if(files.length==1){
+		let json={
+			file:files[0],
+			maxWidth:200,
+			quality:.1
+		};
+
+		let blob=await umax._compress(json);
+
+		umax.form('/demo/form', {fieldName:'blob', files:blob}).catch(()=>{
+			alert('Oh, No!');
+		});
+	}else if(files.length>1){
+		let json={
+			file:files,
+			maxWidth:200,
+			quality:.1
+		};
+
+		let blobArr=await umax._compress(json);
+
+		umax.form('/demo/form', {fieldName:'blob', files:blobArr}).catch(()=>{
+			alert('Oh, No!');
+		});
+	}else{
+		alert('Oh, No!');
+	};
+};
+</script>
 ```
