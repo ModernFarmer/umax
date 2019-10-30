@@ -1,4 +1,4 @@
-if(!HTMLCanvasElement.prototype.toBlob){    // 如果canvas对象没有toBlob方法原型, 则加上(即兼容低版本浏览器)
+if(!HTMLCanvasElement.prototype.toBlob){   // 如果canvas对象没有toBlob方法原型, 则加上(即兼容低版本浏览器)
     Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
         value: function(callback, type, quality){
             let _this=this;
@@ -14,51 +14,34 @@ if(!HTMLCanvasElement.prototype.toBlob){    // 如果canvas对象没有toBlob方
         }
     });
 }
-    
-export default (function(BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOBE_ENCODED, TEMPORARY, __BEFORE, __REQEUST, __CHECK_RESPONSED){
+export default (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOBE_ENCODED, TEMPORARY, __BEFORE, __REQEUST, __CHECK_RESPONSED){
     class ___UM_ajax{
         constructor(){
-            /*this.config={  // ajax的全局配置
-                baseUrl:'http://localhost:8888', // *必须 [string] 设置基础访问地址
-                timeout:null, // [number] 设置超时时间
-                ontimeout:null,  // [function] 设置超时执行函数  自带固定参数: XMLHttpRequest对象
-                responseType:'', // [string] 设置返回的数据类型
-                headers:null, // [json] 设置请求头
-                onprogress:null  // [function] 设置下载进度执行函数  自带固定参数: ProgressEvent对象, 它的.loaded属性代表已经完成发送部分的文件大小[number], 它的.total属性代表整个文件大小[number]
-            };*/
-            this.config=null;
-            this[TEMPORARY]=null;  // 存放单次临时数据的对象
-            this.fixed=null;  // 存放每次请求的固定参数
-            this.beforeRequest=function(config){  // 请求发送前触发 [function]  默认null  自带固定参数: config对象; 代表ajax的*全局*配置
-                // 如果beforeRequest里面有异步函数, 则必须返回一个Promise
-                // 比如:
-                /*return new Promise((resolve, reject)=>{
-                    setTimeout(()=>{
-                        // todo ...
-                        resolve(config);
-                    }, 2000);
-                });*/
-                // todo ...
-                return config;  // 必须返回config
-            };
-            this.responsed=function(result, XMLObj){  // 接收请求数据后立即触发 [function]  默认null  自带固定参数: 1:接收到的数据, 2:XMLHttpRequest对象; 代表ajax的*全局*配置
-                // todo
-            };
+            this[_CONFIG]=null;
+            this[TEMPORARY]=null;
+            this.fixed=null;
+            this.beforeRequest=null;
+            this.responsed=null;
             this.init=function(json){
                 let result={};
-                result.baseUrl=json.baseUrl || null;
-                result.timeout=json.timeout || null;
-                result.ontimeout=json.ontimeout || null;
-                result.responseType=json.responseType || null;
-                result.headers=json.headers || null;
-                result.onprogress=json.onprogress || null;
-                result.user=json.user || null;
-                result.password=json.password || null;
-                if(typeof result.baseUrl==='string' && /^https?\:\/\//.test(result.baseUrl)){
-                    this.config=result;
+                if(!json){
+                    result={baseUrl:''};
+                }else{
+                    result.baseUrl=json.baseUrl || '';
+                    result.timeout=json.timeout || null;
+                    result.ontimeout=json.ontimeout || null;
+                    result.responseType=json.responseType || null;
+                    result.headers=json.headers || null;
+                    result.onprogress=json.onprogress || null;
+                    result.user=json.user || null;
+                    result.password=json.password || null;
+                };
+                if(typeof result.baseUrl==='string'){
+                    result.baseUrl=result.baseUrl.replace(/[\s\r\n]+/g, '').replace(/[\/\\]/g, '/').replace(/[\/]$/, '');
+                    this[_CONFIG]=result;
                     delete this.init;
                 }else{
-                    throw ' -> umax初始化失败!';
+                    throw ' -> umax初始化失败 -> baseUrl必须是一个字符串!';
                 };
             };
         }
@@ -72,17 +55,28 @@ export default (function(BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOBE_ENCODED
             if(json.onprogress)result.onprogress=json.onprogress;
             if(json.user)result.user=json.user;
             if(json.password)result.password=json.password;
+            if(result.baseUrl && typeof result.baseUrl==='string'){
+                result.baseUrl=result.baseUrl.replace(/[\s\r\n]+/g, '').replace(/[\/\\]/g, '/').replace(/[\/]$/, '');
+            }else{
+                result.baseUrl='';
+            };
+
             if(JSON.stringify(result)!=='{}')this[TEMPORARY]=result;
             return this;
         }
         get(url, json){
-            if(!this.config)throw ' -> umax对象未初始化, 请先执行.init()方法初始化ajax对象!';
+            if(!this[_CONFIG])throw ' -> umax对象未初始化, 请先执行.init()方法初始化ajax对象!';
             return new Promise(async (resolve, reject)=>{
                 let _a=await this[BEFORE_OPEN]();
                 let {ajaxObj,trueConfig}=_a;
                 let dataObj=null;
-                if(json)dataObj=this[TOBE_ENCODED](json);
-                let trueUrl=dataObj?trueConfig.baseUrl+url+'?'+dataObj.encoded:trueConfig.baseUrl+url;
+                if(json){
+                    dataObj=this[TOBE_ENCODED](json);
+                }else{
+                    dataObj=this[TOBE_ENCODED]({});
+                };
+                url=url.replace(/[\/\\]/g, '/').replace(/^\//, '');
+                let trueUrl=dataObj?trueConfig.baseUrl+'/'+url+'?'+dataObj.encoded:trueConfig.baseUrl+'/'+url;
                 ajaxObj.open('GET', trueUrl, true, trueConfig.user, trueConfig.password);
                 this[BEFORE_SEND](ajaxObj, trueConfig);
                 ajaxObj.send();
@@ -105,7 +99,8 @@ export default (function(BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOBE_ENCODED
             return new Promise(async (resolve, reject)=>{
                 let _a=await this[BEFORE_OPEN]();
                 let {ajaxObj,trueConfig}=_a;
-                ajaxObj.open('HEAD', trueConfig.baseUrl+url, true, trueConfig.user, trueConfig.password);
+                url=url.replace(/[\/\\]/g, '/').replace(/^\//, '');
+                ajaxObj.open('HEAD', trueConfig.baseUrl+'/'+url, true, trueConfig.user, trueConfig.password);
                 this[BEFORE_SEND](ajaxObj, trueConfig);
                 ajaxObj.send();
                 ajaxObj.onreadystatechange=this[__CHECK_RESPONSED].bind(this, resolve, reject, ajaxObj);
@@ -115,30 +110,20 @@ export default (function(BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOBE_ENCODED
             return new Promise(async (resolve, reject)=>{
                 let _a=await this[BEFORE_OPEN]();
                 let {ajaxObj,trueConfig}=_a;
-                ajaxObj.open('OPTIONS', trueConfig.baseUrl+url, true, trueConfig.user, trueConfig.password);
+                url=url.replace(/[\/\\]/g, '/').replace(/^\//, '');
+                ajaxObj.open('OPTIONS', trueConfig.baseUrl+'/'+url, true, trueConfig.user, trueConfig.password);
                 this[BEFORE_SEND](ajaxObj, trueConfig);
                 ajaxObj.send();
                 ajaxObj.onreadystatechange=this[__CHECK_RESPONSED].bind(this, resolve, reject, ajaxObj);
             });
         }
         form(url, json){
-            /*let aaa={
-                fieldName:'', // 传给后台的文件数组字段名
-                files:file,
-                files:{key0:file0,key1:file1},
-                files:{name:'', file:null},
-                files:[{name:'', file:null}],
-                files:[file0, file1],
-                files:[InputElemnent0, InputElement1],
-                files:InputElement,
-                data:{
-                }
-            };*/
-            if(!this.config)throw ' -> umax对象未初始化, 请先执行.init()方法初始化ajax对象!';
+            if(!this[_CONFIG])throw ' -> umax对象未初始化, 请先执行.init()方法初始化ajax对象!';
             return new Promise(async (resolve, reject)=>{
                 let _a=await this[BEFORE_OPEN]();
                 let {ajaxObj,trueConfig}=_a;
-                ajaxObj.open('POST', trueConfig.baseUrl+url, true, trueConfig.user, trueConfig.password);
+                url=url.replace(/[\/\\]/g, '/').replace(/^\//, '');
+                ajaxObj.open('POST', trueConfig.baseUrl+'/'+url, true, trueConfig.user, trueConfig.password);
                 let formObj=new FormData();
                 if(json.files){
                     if(!json.fieldName)throw '.form(url, json)方法的第二个参数缺少fieldName字段!';
@@ -185,13 +170,18 @@ export default (function(BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOBE_ENCODED
             });
         }
         [__REQEUST](url, method, json){
-            if(!this.config)throw ' -> umax对象未初始化, 请先执行.init()方法初始化ajax对象!';
+            if(!this[_CONFIG])throw ' -> umax对象未初始化, 请先执行.init()方法初始化ajax对象!';
             return new Promise(async (resolve, reject)=>{
                 let _a=await this[BEFORE_OPEN]();
                 let {ajaxObj,trueConfig}=_a;
-                ajaxObj.open(method, trueConfig.baseUrl+url, true, trueConfig.user, trueConfig.password);
+                url=url.replace(/[\/\\]/g, '/').replace(/^\//, '');
+                ajaxObj.open(method, trueConfig.baseUrl+'/'+url, true, trueConfig.user, trueConfig.password);
                 let dataObj=null;
-                if(json)dataObj=this[TOBE_ENCODED](json);
+                if(json){
+                    dataObj=this[TOBE_ENCODED](json);
+                }else{
+                    dataObj=this[TOBE_ENCODED]({});
+                };
                 let _encoded=null;
                 if(dataObj){
                     ajaxObj.setRequestHeader('Content-Type', dataObj.header);
@@ -209,9 +199,23 @@ export default (function(BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOBE_ENCODED
                     temporary=Object.assign({}, this[TEMPORARY]);
                 }
                 this[TEMPORARY]=null;
-                let trueConfig=null;
-                if(this.beforeRequest)trueConfig=await this[__BEFORE](this.beforeRequest, this.config);
-                if(!trueConfig)trueConfig=this.config;
+                let trueConfig=this[_CONFIG];
+                if(this.beforeRequest){
+                    let _c=await this[__BEFORE](this.beforeRequest, this[_CONFIG]);
+                    if(_c.baseUrl)trueConfig.baseUrl=_c.baseUrl;
+                    if(_c.timeout)trueConfig.timeout=_c.timeout;
+                    if(_c.ontimeout)trueConfig.ontimeout=_c.ontimeout;
+                    if(_c.responseType)trueConfig.responseType=_c.responseType;
+                    if(_c.headers)trueConfig.headers=_c.headers;
+                    if(_c.onprogress)trueConfig.onprogress=_c.onprogress;
+                    if(_c.user)trueConfig.user=_c.user;
+                    if(_c.password)trueConfig.password=_c.password;
+                    if(trueConfig.baseUrl && typeof trueConfig.baseUrl==='string'){
+                        trueConfig.baseUrl=trueConfig.baseUrl.replace(/[\s\r\n]+/g, '').replace(/[\/\\]/g, '/').replace(/[\/]$/, '');
+                    }else{
+                        trueConfig.baseUrl='';
+                    };
+                }
                 if(temporary){
                     if(temporary.baseUrl)trueConfig.baseUrl=temporary.baseUrl;
                     if(temporary.timeout)trueConfig.timeout=temporary.timeout;
@@ -338,6 +342,7 @@ export default (function(BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOBE_ENCODED
                 for(let name in item){
                     arr.push(name+'='+item[name]);
                 };
+                if(arr.length===0)return null;
                 return {
                     header:'application/x-www-form-urlencoded',
                     encoded:arr.join('&')
@@ -355,11 +360,11 @@ export default (function(BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOBE_ENCODED
                 };
             });
         }
-        _isJson(obj){             //判断一个对象是否为json对象,返回布尔值
+        _isJson(obj){
             let boolean_isjson = typeof(obj) == "object" && Object.prototype.toString.call(obj).toLowerCase() == "[object object]" && !obj.length;
             return boolean_isjson;
         }
-        _isBase64(str){            //判断一个字符串是否为Base64字符串,返回布尔值
+        _isBase64(str){  //判断一个字符串是否为Base64字符串,返回布尔值
             let arr=str.split(',');
             if(arr.length!==2){
                 return false;
@@ -372,7 +377,7 @@ export default (function(BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOBE_ENCODED
                 return index === -1 || index === len - 1 || (index === len - 2 && str[len - 1] === '=');
             };
         }
-        _toBase64(blobOrFile){     // 将File或者Blob转成Base64, 返回Promise
+        _toBase64(blobOrFile){  // 将File或者Blob转成Base64, 返回Promise
             return new Promise(resolve=>{
                 let obj=new FileReader();
                 obj.readAsDataURL(blobOrFile);
@@ -381,7 +386,7 @@ export default (function(BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOBE_ENCODED
                 }
             });
         }
-        _base64ToBlob(base64){    // 将Base64转成Blob, 返回Blob
+        _base64ToBlob(base64){  // 将Base64转成Blob, 返回Blob
             let arr = base64.split(','),
                 type = arr[0].match(/:(.*?);/)[1],
                 bstr = atob(arr[1]),
@@ -392,7 +397,7 @@ export default (function(BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOBE_ENCODED
             }
             return new Blob([u8arr], {type});
         }
-        _base64ToFile(base64, filename){    // 将Base64转成File, 返回File
+        _base64ToFile(base64, filename){  // 将Base64转成File, 返回File
             let arr = base64.split(','),
                 type = arr[0].match(/:(.*?);/)[1],
                 bstr = atob(arr[1]),
@@ -403,14 +408,13 @@ export default (function(BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOBE_ENCODED
             }
             return new File([u8arr], filename, {type});
         }
-        _compress(json){      // 压缩图片
+        _compress(json){  // 压缩图片, 返回 Blob|[Blob, Blob, ...]
             let file=json.file;
             let maxWidth=json.maxWidth || null;
             let maxHeight=json.maxHeight || null;
             let quality=json.quality || null;
             let type=json.type || 'image/jpeg';
-
-            if(Array.isArray(file)){    // 判断file是否是一个数组
+            if(Array.isArray(file)){  // 判断file是否是一个数组
                 let um_imgArr=[];
                 let um_promiseArr=[];
                 file.forEach(val=>{
@@ -427,7 +431,6 @@ export default (function(BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOBE_ENCODED
                 um_imgArr.forEach((val, i)=>{
                     let promiseObj=new Promise((resolve, reject)=>{
                         val.img.onload=function(){
-                            // 图片原始尺寸
                             let originWidth = this.width;
                             let originHeight = this.height;
                             if((maxWidth && maxWidth>0) && (maxHeight && maxHeight>0)){
@@ -453,12 +456,10 @@ export default (function(BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOBE_ENCODED
                                 val.target_width=originWidth;
                                 val.target_height=originHeight;
                             };
-                            // 指定画布大小
                             val.canvas.width=val.target_width;
                             val.canvas.height=val.target_height;
-                            // 画布生成画面
                             val.context.drawImage(val.img, 0, 0, val.target_width, val.target_height);
-                            if(quality){
+                            if(quality && typeof quality==='number' && quality>0 && quality<=1){
                                 val.canvas.toBlob(blob=>{
                                     resolve({_index:i, _file:blob});
                                 }, 'image/jpeg', quality);
@@ -475,7 +476,6 @@ export default (function(BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOBE_ENCODED
                     });
                     um_promiseArr.push(promiseObj);
                 });
-                
                 return new Promise((resolve, reject)=>{
                     Promise.all(um_promiseArr).then(data=>{
                         data.sort((obj1, obj2)=>{
@@ -500,7 +500,6 @@ export default (function(BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOBE_ENCODED
                     let target_width=0;
                     let target_height=0;
                     img.onload=function(){
-                        // 图片原始尺寸
                         let originWidth = this.width;
                         let originHeight = this.height;
                         if((maxWidth && maxWidth>0) && (maxHeight && maxHeight>0)){
@@ -526,12 +525,10 @@ export default (function(BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOBE_ENCODED
                             target_width=originWidth;
                             target_height=originHeight;
                         };
-                        // 指定画布大小
                         canvas.width=target_width;
                         canvas.height=target_height;
-                        // 画布生成画面
                         context.drawImage(img, 0, 0, target_width, target_height);
-                        if(quality){
+                        if(quality && typeof quality==='number' && quality>0 && quality<=1){
                             canvas.toBlob(blob=>{
                                 resolve(blob);
                             }, 'image/jpeg', quality);
@@ -550,4 +547,4 @@ export default (function(BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOBE_ENCODED
         };
     }
     return new ___UM_ajax();
-})(Symbol('beforOpen'), Symbol('beforeSenc'), Symbol('readResponse'), Symbol('tobeEncoded'), Symbol('temporary'), Symbol('__before'), Symbol('__request'), Symbol('__checkResponsed'));
+})(Symbol('_config'), Symbol('beforOpen'), Symbol('beforeSenc'), Symbol('readResponse'), Symbol('tobeEncoded'), Symbol('temporary'), Symbol('__before'), Symbol('__request'), Symbol('__checkResponsed'));
