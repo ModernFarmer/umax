@@ -303,18 +303,18 @@ export default (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOB
         [TOBE_ENCODED](item){
             if(typeof item=='string'){
                 if(this.fixed){
-                    let arr=[];
-                    for(let key in this.fixed){
-                        arr.push(key+'='+this.fixed[key]);
-                    };
-                    let result=arr.join('&')+'&';
                     try{
                         JSON.parse(item);
                         return {
                             header:'application/json;charset=utf-8',
-                            encoded:result+item
+                            encoded:item
                         };
                     }catch{
+                        let arr=[];
+                        for(let key in this.fixed){
+                            arr.push(key+'='+this.fixed[key]);
+                        };
+                        let result=arr.join('&')+'&';
                         return {
                             header:'application/x-www-form-urlencoded',
                             encoded:result+item
