@@ -64,12 +64,13 @@ umax._compress(json)  --- 压缩file, 返回promise
 　　　　　　　　　　　　　　`(自带固定参数: ProgressEvent对象,`<br>
 　　　　　　　　`它的.loaded属性代表已经完成发送部分的文件大小[number])`<br>
 　　　　　　`user: [string],　　　　　　　　　设置服务器验证账号 [可选]`<br>
-　　　　　　`password: [string]　　　　　　　设置服务器验证密码 [可选]`<br>
+　　　　　　`password: [string],　　　　　　　设置服务器验证密码 [可选]`<br>
+　　　　　　`withCredentials: [boolean],　　设置是否可跨域携带cookie [可选] 默认为false   *IE10+`<br>
 　　　　`}`<br>
 
 **基础案例 :**
 ```javascript
-umax.init({ // .init()方法能接收的json有效字段有:baseUrl、timeout、ontimeout、responseType、headers、onprogress、user、password
+umax.init({ // .init()方法能接收的json有效字段有:baseUrl、timeout、ontimeout、responseType、headers、onprogress、user、password、withCredentials
   baseUrl:'http://localhost:8080',  // 基础地址  默认''
   timeout:10000,  // 最长响应时间(单位:ms)  默认0(无限)
   ontimeout:function(xmlObj){  // 超过最长响应时间后执行的响应事件  默认null
@@ -127,7 +128,7 @@ umax.fixed={
 ```javascript
 umax.beforeRequest=function(config){
   // todo ...
-  console.log(config);  // {baseUrl:'',timeout:null,ontimeout:null,responseType:'',headers:null,onprogress:null,user:null,password:null}
+  console.log(config);  // {baseUrl:'',timeout:null,ontimeout:null,responseType:'',headers:null,onprogress:null,user:null,password:null,withCredentials:false}
   if([some conditions]){
     config.baseUrl='http://localhost:8080'; // 可以对config对象进行配置
   }else{
@@ -254,6 +255,8 @@ umax.post('/demo', JSON.stringify(json)).then(data=>{
 }).catch(err=>{
 	// todo ...
 });
+
+*注: 如果发送的是'json字符串 或者 array字符串'且在调用umax的post()方法之前设置过固定参数, 如:调用post()之前这样设置: umax.fixed({id:'myId', token:'myToken'}), 那么.fixed()方法设置的参数会以key=name&key=name的方式拼接到url地址后面, 然后再将'json字符串 或者 array字符串'以contentType='aplication/json'的方式发送
 
 也可以:
 
@@ -701,11 +704,12 @@ umax._compress(json)  --- To compressed file, return Promise
 　　　　　　　　`Its.loaded property represents the size of the file that has completed sending the portion[number])`<br>
 　　　　　　`user: [string],　　　　　　　　　Set the server authentication account [optional]`<br>
 　　　　　　`password: [string]　　　　　　　Set the server authentication password [optional]`<br>
+　　　　　　`withCredentials: [boolean],　　Sets whether cookies can be carried across domains [optional] default false    *IE10+`<br>
 　　　　`}`<br>
 
 **Based case :**
 ```javascript
-umax.init({ // The json valid fields that the .init() method can receive are:baseUrl、timeout、ontimeout、responseType、headers、onprogress、user、password
+umax.init({ // The json valid fields that the .init() method can receive are:baseUrl、timeout、ontimeout、responseType、headers、onprogress、user、password、withCredentials
   baseUrl:'http://localhost:8080',  // Base url  default ''
   timeout:10000,  // Maximum response time(unit:ms)  default 0(infinite)
   ontimeout:function(xmlObj){  // A response event executed after the maximum response time has been exceeded  default null
@@ -763,7 +767,7 @@ umax.fixed={
 ```javascript
 umax.beforeRequest=function(config){
   // todo ...
-  console.log(config);  // {baseUrl:'',timeout:null,ontimeout:null,responseType:'',headers:null,onprogress:null,user:null,password:null}
+  console.log(config);  // {baseUrl:'',timeout:null,ontimeout:null,responseType:'',headers:null,onprogress:null,user:null,password:null,withCredentials:fasle}
   if([some conditions]){
     config.baseUrl='http://localhost:8080'; // 'onfig' can be configured
   }else{
@@ -890,6 +894,8 @@ umax.post('/demo', JSON.stringify(json)).then(data=>{
 }).catch(err=>{
 	// todo ...
 });
+
+**Note: If you're sending a 'json string or an array string 'and you've set the fixed parameters before calling umax's post() method, like: Set this before calling post(): umax.fixed({id:'myId', token:'myToken'}), then, the parameters set by the fixed() method are spliced after the url address as '?key=name&key=name', then send the 'json string or array string' as contentType='aplication/json'
 
 Can also be:
 
