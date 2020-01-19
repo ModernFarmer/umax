@@ -35,9 +35,10 @@ export default (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOB
                     result.onprogress=json.onprogress || null;
                     result.user=json.user || null;
                     result.password=json.password || null;
+                    result.withCredentials=json.withCredentials===true?true:false;
                 };
                 if(typeof result.baseUrl==='string'){
-                    result.baseUrl=result.baseUrl.replace(/[\s\r\n]+/g, '').replace(/[\/\\]/g, '/').replace(/[\/]$/, '');
+                    result.baseUrl=result.baseUrl.replace(/[\s\r\n]+/g, '').replace(/[\/\\]/g, '/').replace(/\/$/, '');
                     this[_CONFIG]=result;
                     delete this.init;
                 }else{
@@ -55,8 +56,9 @@ export default (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOB
             if(json.onprogress)result.onprogress=json.onprogress;
             if(json.user)result.user=json.user;
             if(json.password)result.password=json.password;
+            if(json.withCredentials)result.withCredentials===true?true:false;
             if(result.baseUrl && typeof result.baseUrl==='string'){
-                result.baseUrl=result.baseUrl.replace(/[\s\r\n]+/g, '').replace(/[\/\\]/g, '/').replace(/[\/]$/, '');
+                result.baseUrl=result.baseUrl.replace(/[\s\r\n]+/g, '').replace(/[\/\\]/g, '/').replace(/\/$/, '');
             }else{
                 result.baseUrl='';
             };
@@ -174,14 +176,15 @@ export default (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOB
             return new Promise(async (resolve, reject)=>{
                 let _a=await this[BEFORE_OPEN]();
                 let {ajaxObj,trueConfig}=_a;
-                url=url.replace(/[\/\\]/g, '/').replace(/^\//, '');
-                ajaxObj.open(method, trueConfig.baseUrl+'/'+url, true, trueConfig.user, trueConfig.password);
                 let dataObj=null;
                 if(json){
                     dataObj=this[TOBE_ENCODED](json);
                 }else{
                     dataObj=this[TOBE_ENCODED]({});
                 };
+                url=url.replace(/[\/\\]/g, '/').replace(/^\//, '');
+                if(dataObj.concatUrl)url+=dataObj.concatUrl;
+                ajaxObj.open(method, trueConfig.baseUrl+'/'+url, true, trueConfig.user, trueConfig.password);
                 let _encoded=null;
                 if(dataObj){
                     ajaxObj.setRequestHeader('Content-Type', dataObj.header);
@@ -210,8 +213,9 @@ export default (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOB
                     if(_c.onprogress)trueConfig.onprogress=_c.onprogress;
                     if(_c.user)trueConfig.user=_c.user;
                     if(_c.password)trueConfig.password=_c.password;
+                    if(_c.withCredentials===true)trueConfig.withCredentials=true;
                     if(trueConfig.baseUrl && typeof trueConfig.baseUrl==='string'){
-                        trueConfig.baseUrl=trueConfig.baseUrl.replace(/[\s\r\n]+/g, '').replace(/[\/\\]/g, '/').replace(/[\/]$/, '');
+                        trueConfig.baseUrl=trueConfig.baseUrl.replace(/[\s\r\n]+/g, '').replace(/[\/\\]/g, '/').replace(/\/$/, '');
                     }else{
                         trueConfig.baseUrl='';
                     };
@@ -225,6 +229,12 @@ export default (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOB
                     if(temporary.onprogress)trueConfig.onprogress=temporary.onprogress;
                     if(temporary.user)trueConfig.user=temporary.user;
                     if(temporary.password)trueConfig.password=temporary.password;
+                    if(temporary.withCredentials===true)trueConfig.withCredentials=true;
+                    if(trueConfig.baseUrl && typeof trueConfig.baseUrl==='string'){
+                        trueConfig.baseUrl=trueConfig.baseUrl.replace(/[\s\r\n]+/g, '').replace(/[\/\\]/g, '/').replace(/\/$/, '');
+                    }else{
+                        trueConfig.baseUrl='';
+                    };
                 }
                 let ajaxObj=null;
                 if(window.XMLHttpRequest){
@@ -255,6 +265,7 @@ export default (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOB
                     };
                 }
             }
+            if(trueConfig.withCredentials===true)ajaxObj.withCredentials=true;
         }
         [READY_RESPONSED](resolve, reject, ajaxObj){
             if(ajaxObj.readyState==4){
@@ -305,9 +316,15 @@ export default (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOB
                 if(this.fixed){
                     try{
                         JSON.parse(item);
+                        let arr=[];
+                        for(let key in this.fixed){
+                            arr.push(key+'='+this.fixed[key]);
+                        };
+                        let result='?'+arr.join('&')+'&';
                         return {
                             header:'application/json;charset=utf-8',
-                            encoded:item
+                            encoded:item,
+                            concatUrl:result
                         };
                     }catch{
                         let arr=[];
@@ -461,11 +478,11 @@ export default (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOB
                             val.context.drawImage(val.img, 0, 0, val.target_width, val.target_height);
                             if(quality && typeof quality==='number' && quality>0 && quality<=1){
                                 val.canvas.toBlob(blob=>{
-                                    resolve({_index:i, _file:blob});
+                                    resolve(blob);
                                 }, 'image/jpeg', quality);
                             }else{
                                 val.canvas.toBlob(blob=>{
-                                    resolve({_index:i, _file:blob});
+                                    resolve(blob);
                                 }, type);
                             };
                         };
@@ -478,14 +495,6 @@ export default (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOB
                 });
                 return new Promise((resolve, reject)=>{
                     Promise.all(um_promiseArr).then(data=>{
-                        data.sort((obj1, obj2)=>{
-                            let n1=obj1._index;
-                            let n2=obj2._index;
-                            return n1-n2;
-                        });
-                        data.forEach((val, i, arr)=>{
-                            arr[i]=val._file;
-                        });
                         resolve(data);
                     }).catch(err=>{
                         reject(err);
