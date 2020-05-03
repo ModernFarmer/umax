@@ -943,7 +943,7 @@ fileElement_1.onchange=async function(){
 		files:umax._base64ToBlob(await umax._toBase64(files[0])),  // Receive Blob
 		files:fileElement_1,  // Receive input[type=file] element, all files on the fileElement_1 element will be sent
 		files:{name:'name_1', file:files[0]}, // Receive {name:'name', file:file} data, If the files parameter is a json, the umax object first execute 'name in json' and 'file in json', if true, It will send a file to the background like this: new FormData(fieldName, json.file, json.name), *Thus, only one file can be sent*
-		files:{'name_1.jpg':files[0], 'name_2.jpg':files[1]}, // Receive {name:file} data, If the files parameter is a json, if there is no 'name' key and no 'file' key, It will send a file to the background like this:new FormData(fieldName, keyOfjson, json[keyOfjson]), *In this way, multiple files can be sent*
+		files:{'name_1.jpg':files[0], 'name_2.jpg':files[1]}, // Receive {name:file} data, If the files parameter is a json, if there is no 'name' key and no 'file' key, It will send a file to the background like this:new FormData(fieldName, json[keyOfjson], keyOfjson), *In this way, multiple files can be sent*
 		files:[blob1, blob2],  // Receive [Blob, Blob, ...]
 		files:[fileElement_1, fileElement_2],  // Receive [HTMLInputElement, HTMLInputElement, ...], all 'input[type=file]' files on all elements in the array will be sent
 		files:[...files],  // Receive [File, File, ...], it is important to note that 'files' are not array, and they must be converted to array before they can be received by the method
