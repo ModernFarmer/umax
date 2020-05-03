@@ -304,7 +304,7 @@ fileElement_1.onchange=async function(){
 		files:umax._base64ToBlob(await umax._toBase64(files[0])),  // 接收Blob
 		files:fileElement_1,  // 接收h5的input[type=file]元素, 将会把fileElement_1元素上所有的文件都发送
 		files:{name:'name_1', file:files[0]}, // 接收{name:'name', file:file}数据, 如果files参数是一个json, umax对象会先判断name in json和file in json, 如果有, 则会像这样给后台发送文件:new FormData(fieldName, json.file, json.name), *这样只能发送一个文件*
-		files:{'name_1.jpg':files[0], 'name_2.jpg':files[1]}, // 接收{name:file}数据, 如果files参数是一个json, 且没有name键名和file键名, 那么会像这样给后台发送文件:new FormData(fieldName, keyOfjson, json[keyOfjson]), *这样可以发送多个文件*
+		files:{'name_1.jpg':files[0], 'name_2.jpg':files[1]}, // 接收{name:file}数据, 如果files参数是一个json, 且没有'name'键名和'file'键名, 那么会像这样给后台发送文件:new FormData(fieldName, json[keyOfjson], keyOfjson), *这样可以发送多个文件*
 		files:[blob1, blob2],  // 接收[Blob, Blob, ...]
 		files:[fileElement_1, fileElement_2],  // 接收[HTMLInputElement, HTMLInputElement, ...], 将会把数组内所有元素上所有input[type=file]的文件都发送
 		files:[...files],  // 接收[File, File, ...], 这里要特别注意, files不是array, 要先将其转换成array才能被方法接收
