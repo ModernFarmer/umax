@@ -183,7 +183,7 @@ export default (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOB
                     dataObj=this[TOBE_ENCODED]({});
                 };
                 url=url.replace(/[\/\\]/g, '/').replace(/^\//, '');
-                if(dataObj.concatUrl)url+=dataObj.concatUrl;
+                if(dataObj && dataObj.concatUrl)url+=dataObj.concatUrl;
                 ajaxObj.open(method, trueConfig.baseUrl+'/'+url, true, trueConfig.user, trueConfig.password);
                 let _encoded=null;
                 if(dataObj){
