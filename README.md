@@ -13,14 +13,18 @@ npm install umax
 ```javascript
 import umax from 'umax'
 ```
+
 *\*该模块未进行任何编译, 在某些情况下需要自行处理编译*
 ------
+
 ***比如在`vue-cli3.x`中使用时, 由于`vue-cli3`默认不编译`node_modules`中的文件, 导致项目在IE环境下会报错,  所以这个时候就需要在`vue.config.js`中做如下配置:***
+
 ```javascript
 module.exports = {
   transpileDependencies: [/(?:[/\\]node_modules[/\\].?umax@.*[/\\])|(?:[/\\]node_modules[/\\]umax[/\\])/]
 }
 ```
+
 **以下是本模块所有可使用的属性和方法:**
 
 ```javascript
@@ -661,6 +665,16 @@ npm install umax
 
 ```javascript
 import umax from 'umax'
+```
+*\*This module does not be compiled, and in some cases you needs to handle yourself*
+------
+
+***For example, when used it in `vue-cli3`, files in 'node_modules' are not compiled by defaults in `vue-cli3`, Causes the project to report errors in IE. Therefore, at this time you need to do the following configuration in `vue.config.js`:***
+
+```javascript
+module.exports = {
+  transpileDependencies: [/(?:[/\\]node_modules[/\\].?umax@.*[/\\])|(?:[/\\]node_modules[/\\]umax[/\\])/]
+}
 ```
 
 **Here are all the properties and methods available for this module:**
