@@ -202,7 +202,7 @@ export default (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOB
                     temporary=Object.assign({}, this[TEMPORARY]);
                 }
                 this[TEMPORARY]=null;
-                let trueConfig=this[_CONFIG];
+                let trueConfig=Object.assign({}, this[_CONFIG]);
                 if(this.beforeRequest){
                     let _c=await this[__BEFORE](this.beforeRequest, this[_CONFIG]);
                     if(_c.baseUrl)trueConfig.baseUrl=_c.baseUrl;
@@ -324,7 +324,7 @@ export default (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOB
                         return {
                             header:'application/json;charset=utf-8',
                             encoded:item,
-                            concatUrl:result
+                            concatUrl:result.replace(/\+/g, '%2B')
                         };
                     }catch{
                         let arr=[];
@@ -334,7 +334,7 @@ export default (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOB
                         let result=arr.join('&')+'&';
                         return {
                             header:'application/x-www-form-urlencoded',
-                            encoded:result+item
+                            encoded:(result+item).replace(/\+/g, '%2B')
                         };
                     }
                 }else{
@@ -347,7 +347,7 @@ export default (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOB
                     }catch{
                         return {
                             header:'application/x-www-form-urlencoded',
-                            encoded:item
+                            encoded:item.replace(/\+/g, '%2B')
                         };
                     }
                 };
@@ -362,7 +362,7 @@ export default (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOB
                 if(arr.length===0)return null;
                 return {
                     header:'application/x-www-form-urlencoded',
-                    encoded:arr.join('&')
+                    encoded:arr.join('&').replace(/\+/g, '%2B')
                 };
             }else{
                 throw 'umax对象的.get .post .put .patch .delete方法的第二个参数只能接收 字符串 或者 json!';
