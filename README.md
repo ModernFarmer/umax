@@ -1,5 +1,5 @@
 *该模块是基于ES6的Promise封装的的ajax, 特别是能非常简单地操作文件上传, 模块还提供了文件压缩、文件转换等方法.*
-　<br><br><br>
+<br><br><br>
 *This module is based on ES6 Promise package ajax, especially can be very simple operation file upload, the module also provides file compression, file conversion and other methods.*
 **The English API is at the back of the page!**<br><br><br>
 **下载:**
@@ -13,7 +13,16 @@ npm install umax
 ```javascript
 import umax from 'umax'
 ```
-
+<br>
+**\*该模块未进行任何编译, 在某些情况下需要自行处理编译**
+------
+***比如在vue-cli3.x中使用时, 由于vue-cli3默认不编译node_modules中的文件, 导致项目在IE环境下会报错,  所以这个时候就需要在vue.config.js中做如下配置:***
+```javascript
+module.exports = {
+  transpileDependencies: [/(?:[/\\]node_modules[/\\].?umax@.*[/\\])|(?:[/\\]node_modules[/\\]umax[/\\])/]
+}
+```
+<br>
 **以下是本模块所有可使用的属性和方法:**
 
 ```javascript
@@ -102,7 +111,7 @@ umax.init();   // 默认配置, 等同于umax({baseUrl:''});
 
 　参数 :<br>
 　　**.fixed** = *json*  [可选]<br>
-　　`json:　每次调取接口都需要上传的固定参数　　必须 (json配置同.init()方法)`<br>
+　　`json:　每次调取接口都需要上传的固定参数　　必须`<br>
 
 **基础案例 :**
 ```javascript
@@ -638,7 +647,10 @@ fileElement.onchange=async function(){
 </script>
 ```
 <br>
-**English API  \>\>\>**
+
+`English API  \>\>\>`
+------
+
 <br>
 
 **Download:**
@@ -741,7 +753,7 @@ umax.init();   // Default configuration, is equivalent to umax({baseUrl:''});
 
 　Parameter :<br>
 　　**.fixed** = *json*  [optional]<br>
-　　`json:　Each call interface needs to upload fixed parameters　　<must> (configuration of json is the same of .init() method)`<br>
+　　`json:　Each call interface needs to upload fixed parameters　　<must>`<br>
 
 **Based case :**
 ```javascript
