@@ -15,7 +15,7 @@ import umax from 'umax'
 ```
 *\*该模块未进行任何编译, 在某些情况下需要自行处理编译*
 ------
-***比如在vue-cli3.x中使用时, 由于vue-cli3默认不编译node_modules中的文件, 导致项目在IE环境下会报错,  所以这个时候就需要在vue.config.js中做如下配置:***
+***比如在`vue-cli3.x`中使用时, 由于`vue-cli3`默认不编译`node_modules`中的文件, 导致项目在IE环境下会报错,  所以这个时候就需要在`vue.config.js`中做如下配置:***
 ```javascript
 module.exports = {
   transpileDependencies: [/(?:[/\\]node_modules[/\\].?umax@.*[/\\])|(?:[/\\]node_modules[/\\]umax[/\\])/]
