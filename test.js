@@ -1,0 +1,1 @@
+const str = 'This is just a test test!'
