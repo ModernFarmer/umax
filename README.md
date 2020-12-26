@@ -11,7 +11,12 @@ npm install umax
 **引入:**
 
 ```javascript
-import umax from 'umax'
+import umax from 'umax' // 引用umax对象
+
+或者
+
+import { Umax } from 'umax' // 引用umax构造函数
+const umax = new Umax();
 ```
 
 *\*该模块未进行任何编译, 在某些情况下需要自行处理编译*
@@ -69,6 +74,8 @@ umax._compress(json)  --- 压缩file, 返回promise
 　　　　　　`timeout: [number],　　　　　　　设置最长响应时间 [可选]`<br>
 　　　　　　`ontimeout: [function],　　　设置超过最长响应时间后的回调函数 [可选]`<br>
 　　　　　　　　　　　　　　`(该函数自带固定参数: XMLHttpRequest对象)`<br>
+　　　　　　`onerror: [function],　　　设置网络异常后的回调函数 [可选]`<br>
+　　　　　　　　　　　　　　`(该函数自带固定参数: XMLHttpRequest对象)`<br>
 　　　　　　`responseType: [string],　　　　设置返回的数据类型 [可选]`<br>
 　　　　　　`headers: [json],　　　　　　　　设置请求头 [可选]`<br>
 　　　　　　`onprogress: [function],　　　　设置下载进度执行函数 [可选]`<br>
@@ -81,10 +88,13 @@ umax._compress(json)  --- 压缩file, 返回promise
 
 **基础案例 :**
 ```javascript
-umax.init({ // .init()方法能接收的json有效字段有:baseUrl、timeout、ontimeout、responseType、headers、onprogress、user、password、withCredentials
+umax.init({ // .init()方法能接收的json有效字段有:baseUrl、timeout、ontimeout、onerror、responseType、headers、onprogress、user、password、withCredentials
   baseUrl:'http://localhost:8080',  // 基础地址  默认''
   timeout:10000,  // 最长响应时间(单位:ms)  默认0(无限)
   ontimeout:function(xmlObj){  // 超过最长响应时间后执行的响应事件  默认null
+    console.log(xmlObj.statusText)
+  },
+  onerror:function(xmlObj){  // 超过网络异常后执行的响应事件  默认null
     console.log(xmlObj.statusText)
   },
   responseType:'text',  // 设置接收类型  默认''
@@ -139,7 +149,7 @@ umax.fixed={
 ```javascript
 umax.beforeRequest=function(config){
   // todo ...
-  console.log(config);  // {baseUrl:'',timeout:null,ontimeout:null,responseType:'',headers:null,onprogress:null,user:null,password:null,withCredentials:false}
+  console.log(config);  // {baseUrl:'',timeout:null,ontimeout:null,onerror:null,responseType:'',headers:null,onprogress:null,user:null,password:null,withCredentials:false}
   if([some conditions]){
     config.baseUrl='http://localhost:8080'; // 可以对config对象进行配置
   }else{
@@ -184,6 +194,9 @@ let json={
   baseUrl:'http://localhost:8081',
   timeout:10000,
   ontimeout:function(xmlObj){
+    console.log(xmlObj.statusText)
+  },
+  oerror:function(xmlObj){
     console.log(xmlObj.statusText)
   },
   responseType:'text',
@@ -664,7 +677,11 @@ npm install umax
 **Import:**
 
 ```javascript
-import umax from 'umax'
+import umax from 'umax' // import umax
+
+or
+
+import { Umax } from 'umax' // import the constructor of umax
 ```
 *\*This module does not be compiled, and in some cases you needs to handle yourself*
 ------
@@ -721,6 +738,8 @@ umax._compress(json)  --- To compressed file, return Promise
 　　　　　　`timeout: [number],　　　　　　　Set the maximum response time [optional]`<br>
 　　　　　　`ontimeout: [function],　　　Sets the callback function after the maximum response time [optional]`<br>
 　　　　　　　　　　　　　　`(Built-in fixed parameters: XMLHttpRequest object)`<br>
+　　　　　　`oerror: [function],　　　Sets the callback function after network error [optional]`<br>
+　　　　　　　　　　　　　　`(Built-in fixed parameters: XMLHttpRequest object)`<br>
 　　　　　　`responseType: [string],　　　　Sets the data type returned [optional]`<br>
 　　　　　　`headers: [json],　　　　　　　　Set request header [optional]`<br>
 　　　　　　`onprogress: [function],　　　　Set the download progress execution function [optional]`<br>
@@ -733,10 +752,13 @@ umax._compress(json)  --- To compressed file, return Promise
 
 **Based case :**
 ```javascript
-umax.init({ // The json valid fields that the .init() method can receive are:baseUrl、timeout、ontimeout、responseType、headers、onprogress、user、password、withCredentials
+umax.init({ // The json valid fields that the .init() method can receive are:baseUrl、timeout、ontimeout、oerror、responseType、headers、onprogress、user、password、withCredentials
   baseUrl:'http://localhost:8080',  // Base url  default ''
   timeout:10000,  // Maximum response time(unit:ms)  default 0(infinite)
   ontimeout:function(xmlObj){  // A response event executed after the maximum response time has been exceeded  default null
+    console.log(xmlObj.statusText)
+  },
+  onerror:function(xmlObj){  // A response event executed after network error  default null
     console.log(xmlObj.statusText)
   },
   responseType:'text',  // Set receive type  default ''
@@ -791,7 +813,7 @@ umax.fixed={
 ```javascript
 umax.beforeRequest=function(config){
   // todo ...
-  console.log(config);  // {baseUrl:'',timeout:null,ontimeout:null,responseType:'',headers:null,onprogress:null,user:null,password:null,withCredentials:fasle}
+  console.log(config);  // {baseUrl:'',timeout:null,ontimeout:null,onerror:null,responseType:'',headers:null,onprogress:null,user:null,password:null,withCredentials:fasle}
   if([some conditions]){
     config.baseUrl='http://localhost:8080'; // 'onfig' can be configured
   }else{
@@ -836,6 +858,9 @@ let json={
   baseUrl:'http://localhost:8081',
   timeout:10000,
   ontimeout:function(xmlObj){
+    console.log(xmlObj.statusText)
+  },
+  onerror:function(xmlObj){
     console.log(xmlObj.statusText)
   },
   responseType:'text',
