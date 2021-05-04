@@ -1,4 +1,4 @@
-if(!HTMLCanvasElement.prototype.toBlob){   // 如果canvas对象没有toBlob方法原型, 则加上(即兼容低版本浏览器)
+if(!HTMLCanvasElement.prototype.toBlob){   // 如果canvas对象没有toBlob方法原型, 则加上(兼容低版本浏览器)
     Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
         value: function(callback, type, quality){
             let _this = this;
@@ -14,7 +14,7 @@ if(!HTMLCanvasElement.prototype.toBlob){   // 如果canvas对象没有toBlob方�
         }
     });
 }
-export const Umax = (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOBE_ENCODED, TEMPORARY, __BEFORE, __REQEUST, __CHECK_RESPONSED){
+export const Umax = (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED, TOBE_ENCODED, TEMPORARY, __BEFORE, __REQUEST_BODY, __REQUEST_ENCODED,  __REQUEST_SIMPLE,  __CHECK_RESPONSED){
     return class umax{
         constructor(){
             this[_CONFIG] = null;
@@ -69,71 +69,34 @@ export const Umax = (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED
             return this;
         }
         get(url, json){
-            if(!this[_CONFIG])throw ' -> umax对象未初始化, 请先执行.init()方法初始化ajax对象!';
-            return new Promise(async (resolve, reject) => {
-                let _a = await this[BEFORE_OPEN]();
-                let {ajaxObj,trueConfig} = _a;
-                let dataObj = null;
-                if(json){
-                    dataObj = this[TOBE_ENCODED](json);
-                }else{
-                    dataObj = this[TOBE_ENCODED]({});
-                };
-                url = url.replace(/[\/\\]/g, '/').replace(/^\//, '');
-                let trueUrl = '';
-                if(dataObj){
-                    let encoded = url.indexOf('?') > -1 ? '&' + dataObj.encoded : '?' + dataObj.encoded;
-                    trueUrl = trueConfig.baseUrl + '/' + url + encoded;
-                }else{
-                    trueUrl = trueConfig.baseUrl + '/' + url;
-                };
-                ajaxObj.open('GET', trueUrl, true, trueConfig.user, trueConfig.password);
-                this[BEFORE_SEND](ajaxObj, trueConfig);
-                ajaxObj.send();
-                ajaxObj.onreadystatechange = this[READY_RESPONSED].bind(this, resolve, reject, ajaxObj);
-            });
-        }
-        post(url, json){
-            return this[__REQEUST](url, 'POST', json);
-        }
-        put(url, json){
-            return this[__REQEUST](url, 'PUT', json);
+            return this[__REQUEST_ENCODED](url, 'GET', json);
         }
         delete(url, json){
-            return this[__REQEUST](url, 'DELETE', json);
+            return this[__REQUEST_ENCODED](url, 'DELETE', json);
+        }
+        post(url, json){
+            return this[__REQUEST_BODY](url, 'POST', json);
+        }
+        put(url, json){
+            return this[__REQUEST_BODY](url, 'PUT', json);
         }
         patch(url, json){
-            return this[__REQEUST](url, 'PATCH', json);
+            return this[__REQUEST_BODY](url, 'PATCH', json);
         }
         head(url){
-            return new Promise(async (resolve, reject)=>{
-                let _a = await this[BEFORE_OPEN]();
-                let {ajaxObj,trueConfig} = _a;
-                url = url.replace(/[\/\\]/g, '/').replace(/^\//, '');
-                ajaxObj.open('HEAD', trueConfig.baseUrl + '/' + url, true, trueConfig.user, trueConfig.password);
-                this[BEFORE_SEND](ajaxObj, trueConfig);
-                ajaxObj.send();
-                ajaxObj.onreadystatechange = this[__CHECK_RESPONSED].bind(this, resolve, reject, ajaxObj);
-            });
+            return this[__REQUEST_SIMPLE](url, 'HEAD');
         }
         options(url){
-            return new Promise(async (resolve, reject) => {
-                let _a = await this[BEFORE_OPEN]();
-                let {ajaxObj,trueConfig} = _a;
-                url = url.replace(/[\/\\]/g, '/').replace(/^\//, '');
-                ajaxObj.open('OPTIONS', trueConfig.baseUrl + '/' + url, true, trueConfig.user, trueConfig.password);
-                this[BEFORE_SEND](ajaxObj, trueConfig);
-                ajaxObj.send();
-                ajaxObj.onreadystatechange = this[__CHECK_RESPONSED].bind(this, resolve, reject, ajaxObj);
-            });
+            return this[__REQUEST_SIMPLE](url, 'OPTIONS');
         }
         form(url, json){
             if(!this[_CONFIG])throw ' -> umax对象未初始化, 请先执行.init()方法初始化ajax对象!';
-            return new Promise(async (resolve, reject)=>{
-                let _a = await this[BEFORE_OPEN]();
-                let {ajaxObj,trueConfig} = _a;
+            return new Promise(async resolve => {
+                let {ajaxObj,trueConfig} = await this[BEFORE_OPEN]();
                 url = url.replace(/[\/\\]/g, '/').replace(/^\//, '');
-                ajaxObj.open('POST', trueConfig.baseUrl + '/' + url, true, trueConfig.user, trueConfig.password);
+                let trueUrl = '';
+                trueUrl = (url.indexOf('https://') > -1 || url.indexOf('http://') > -1) ? url : trueConfig.baseUrl + '/' + url;
+                ajaxObj.open('POST', trueUrl, true, trueConfig.user, trueConfig.password);
                 let formObj = new FormData();
                 if(json.files){
                     if(!json.fieldName)throw '.form(url, json)方法的第二个参数缺少fieldName字段!';
@@ -176,14 +139,14 @@ export const Umax = (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED
                 }
                 this[BEFORE_SEND](ajaxObj, trueConfig);
                 ajaxObj.send(formObj);
-                ajaxObj.onreadystatechange = this[READY_RESPONSED].bind(this, resolve, reject, ajaxObj);
+                ajaxObj.onreadystatechange = this[READY_RESPONSED].bind(this, resolve, ajaxObj);
+                ajaxObj = null;
             });
         }
-        [__REQEUST](url, method, json){
+        [__REQUEST_BODY](url, method, json){
             if(!this[_CONFIG])throw ' -> umax对象未初始化, 请先执行.init()方法初始化ajax对象!';
-            return new Promise(async (resolve, reject) => {
-                let _a = await this[BEFORE_OPEN]();
-                let {ajaxObj,trueConfig} = _a;
+            return new Promise(async resolve => {
+                let {ajaxObj,trueConfig} = await this[BEFORE_OPEN]();
                 let dataObj = null;
                 if(json){
                     dataObj = this[TOBE_ENCODED](json);
@@ -191,11 +154,13 @@ export const Umax = (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED
                     dataObj = this[TOBE_ENCODED]({});
                 };
                 url = url.replace(/[\/\\]/g, '/').replace(/^\//, '');
+                let trueUrl = '';
                 if(dataObj && dataObj.concatUrl){
                     let concatUrl = url.indexOf('?') > -1 ? '&' + dataObj.concatUrl : '?' + dataObj.concatUrl;
                     url += concatUrl;
                 }
-                ajaxObj.open(method, trueConfig.baseUrl + '/' + url, true, trueConfig.user, trueConfig.password);
+                trueUrl = (url.indexOf('https://') > -1 || url.indexOf('http://') > -1) ? url : trueConfig.baseUrl + '/' + url;
+                ajaxObj.open(method, trueUrl, true, trueConfig.user, trueConfig.password);
                 let _encoded = null;
                 if(dataObj){
                     ajaxObj.setRequestHeader('Content-Type', dataObj.header);
@@ -203,11 +168,50 @@ export const Umax = (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED
                 }
                 this[BEFORE_SEND](ajaxObj, trueConfig);
                 ajaxObj.send(_encoded);
-                ajaxObj.onreadystatechange = this[READY_RESPONSED].bind(this, resolve, reject, ajaxObj);
+                ajaxObj.onreadystatechange = this[READY_RESPONSED].bind(this, resolve, ajaxObj);
+                ajaxObj = null;
+            });
+        }
+        [__REQUEST_ENCODED](url, method, json){
+            if(!this[_CONFIG])throw ' -> umax对象未初始化, 请先执行.init()方法初始化ajax对象!';
+            return new Promise(async resolve => {
+                let {ajaxObj,trueConfig} = await this[BEFORE_OPEN]();
+                let dataObj = null;
+                if(json){
+                    dataObj = this[TOBE_ENCODED](json);
+                }else{
+                    dataObj = this[TOBE_ENCODED]({});
+                };
+                url = url.replace(/[\/\\]/g, '/').replace(/^\//, '');
+                let trueUrl = '';
+                if(dataObj){
+                    let encoded = url.indexOf('?') > -1 ? '&' + dataObj.encoded : '?' + dataObj.encoded;
+                    trueUrl = (url.indexOf('https://') > -1 || url.indexOf('http://') > -1) ? url + encoded : trueConfig.baseUrl + '/' + url + encoded;
+                }else{
+                    trueUrl = (url.indexOf('https://') > -1 || url.indexOf('http://') > -1) ? url : trueConfig.baseUrl + '/' + url;
+                };
+                ajaxObj.open(method, trueUrl, true, trueConfig.user, trueConfig.password);
+                this[BEFORE_SEND](ajaxObj, trueConfig);
+                ajaxObj.send();
+                ajaxObj.onreadystatechange = this[READY_RESPONSED].bind(this, resolve, ajaxObj);
+                ajaxObj = null;
+            });
+        }
+        [__REQUEST_SIMPLE](url, method){
+            return new Promise(async resolve => {
+                let {ajaxObj,trueConfig} = await this[BEFORE_OPEN]();
+                url = url.replace(/[\/\\]/g, '/').replace(/^\//, '');
+                let trueUrl = '';
+                trueUrl = (url.indexOf('https://') > -1 || url.indexOf('http://') > -1) ? url : trueConfig.baseUrl + '/' + url;
+                ajaxObj.open(method, trueUrl, true, trueConfig.user, trueConfig.password);
+                this[BEFORE_SEND](ajaxObj, trueConfig);
+                ajaxObj.send();
+                ajaxObj.onreadystatechange = this[__CHECK_RESPONSED].bind(this, resolve, ajaxObj);
+                ajaxObj = null;
             });
         }
         [BEFORE_OPEN](){
-            return new Promise(async (resolve, reject) => {
+            return new Promise(async resolve => {
                 let temporary = null;
                 if(this[TEMPORARY]){
                     temporary = Object.assign({}, this[TEMPORARY]);
@@ -249,6 +253,11 @@ export const Umax = (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED
                         trueConfig.baseUrl = '';
                     };
                 }
+                if (trueConfig.headers && !trueConfig.headers['Accept']) {
+                    trueConfig.headers['Accept'] = 'application/json, text/plain, */*';
+                } else if (!trueConfig.headers) {
+                    trueConfig.headers = {'Accept': 'application/json, text/plain, */*'};
+                }
                 let ajaxObj = null;
                 if(window.XMLHttpRequest){
                     ajaxObj = new XMLHttpRequest();
@@ -285,49 +294,51 @@ export const Umax = (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED
             }
             if(trueConfig.withCredentials === true)ajaxObj.withCredentials = true;
         }
-        [READY_RESPONSED](resolve, reject, ajaxObj){
+        [READY_RESPONSED](resolve, ajaxObj){
             if(ajaxObj.readyState === 4){
                 let data = ajaxObj.response;
                 if(this.responsed && typeof this.responsed === 'function'){
                     if(ajaxObj.responseType){
-                        this.responsed(data, ajaxObj);
+                        if(this._isJson(data)){
+                            this.responsed(JSON.parse(JSON.stringify(data)), ajaxObj);
+                        }else{
+                            this.responsed(data, ajaxObj);
+                        };
+                        resolve(data);
                     }else{
                         try{
                             let r = JSON.parse(data);
                             this.responsed(r, ajaxObj);
-                        }catch{
+                            resolve(JSON.parse(data));
+                        }catch(err){
                             this.responsed(data, ajaxObj);
-                        }
-                    };
-                }
-                if(ajaxObj.status >= 200 && ajaxObj.status < 300 || ajaxObj.status === 304){
-                    if(ajaxObj.responseType){
-                        resolve(data);
-                    }else{
-                        try{
-                            let _r = JSON.parse(data);
-                            resolve(_r);
-                        }catch{
                             resolve(data);
                         }
                     };
                 }else{
-                    reject({statusText:ajaxObj.statusText, status:ajaxObj.status, responseURL:ajaxObj.responseURL});
-                };
+                    if(ajaxObj.responseType){
+                        resolve(data);
+                    }else{
+                        try{
+                            let r = JSON.parse(data);
+                            resolve(r);
+                        }catch(err){
+                            resolve(data);
+                        }
+                    };
+                }
             }
+            ajaxObj = null;
         }
-        [__CHECK_RESPONSED](resolve, reject, ajaxObj){
+        [__CHECK_RESPONSED](resolve, ajaxObj){
             if(ajaxObj.readyState === 4){
                 let headers = ajaxObj.getAllResponseHeaders().toLowerCase();
                 if(this.responsed && typeof this.responsed === 'function'){
                     this.responsed({headers, statusText:ajaxObj.statusText, status:ajaxObj.status, responseURL:ajaxObj.responseURL}, ajaxObj);
                 }
-                if(ajaxObj.status >= 200 && ajaxObj.status < 300 || ajaxObj.status === 304){
-                    resolve({headers, statusText:ajaxObj.statusText, status:ajaxObj.status, responseURL:ajaxObj.responseURL});
-                }else{
-                    reject({statusText:ajaxObj.statusText, status:ajaxObj.status, responseURL:ajaxObj.responseURL});
-                };
+                resolve({headers, statusText:ajaxObj.statusText, status:ajaxObj.status, responseURL:ajaxObj.responseURL});
             }
+            ajaxObj = null;
         }
         [TOBE_ENCODED](item){
             if(typeof item === 'string'){
@@ -344,7 +355,7 @@ export const Umax = (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED
                             encoded:item,
                             concatUrl:result.replace(/\+/g, '%2B')
                         };
-                    }catch{
+                    }catch(err){
                         let arr = [];
                         for(let key in this.fixed){
                             arr.push(key + '=' + this.fixed[key]);
@@ -363,7 +374,7 @@ export const Umax = (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED
                             header:'application/json;charset=utf-8',
                             encoded:item
                         };
-                    }catch{
+                    }catch(err){
                         return {
                             header:'application/x-www-form-urlencoded',
                             encoded:item.replace(/\+/g, '%2B')
@@ -388,7 +399,7 @@ export const Umax = (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED
             };
         }
         [__BEFORE](fn, config){
-            return new Promise((resolve, reject) => {
+            return new Promise(resolve => {
                 if(!fn){
                     resolve(null);
                 }else{
@@ -464,8 +475,8 @@ export const Umax = (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED
                     um_json.target_height = 0;
                     um_imgArr.push(um_json);
                 });
-                um_imgArr.forEach((val, i) => {
-                    let promiseObj = new Promise((resolve, reject) => {
+                um_imgArr.forEach(val => {
+                    let promiseObj = new Promise(resolve => {
                         val.img.onload = function(){
                             let originWidth = this.width;
                             let originHeight = this.height;
@@ -512,15 +523,13 @@ export const Umax = (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED
                     });
                     um_promiseArr.push(promiseObj);
                 });
-                return new Promise((resolve, reject) => {
+                return new Promise(resolve => {
                     Promise.all(um_promiseArr).then(data => {
                         resolve(data);
-                    }).catch(err => {
-                        reject(err);
                     });
                 });
             }else{
-                return new Promise((resolve, reject) => {
+                return new Promise(resolve => {
                     let reader = new FileReader();
                     let img = new Image();
                     let canvas = document.createElement('canvas');
@@ -574,6 +583,6 @@ export const Umax = (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED
             };
         };
     }
-})(Symbol('_config'), Symbol('beforOpen'), Symbol('beforeSenc'), Symbol('readResponse'), Symbol('tobeEncoded'), Symbol('temporary'), Symbol('__before'), Symbol('__request'), Symbol('__checkResponsed'));
+})(Symbol('_config'), Symbol('beforOpen'), Symbol('beforeSenc'), Symbol('readResponse'), Symbol('tobeEncoded'), Symbol('temporary'), Symbol('__before'), Symbol('__request_body'), Symbol('__request_encoded'), Symbol('__request_simple'), Symbol('__checkResponsed'));
 
 export default new Umax();
