@@ -1,0 +1,57 @@
+{
+  "__npminstall_done": "Sun Jul 05 2020 23:11:07 GMT+0800 (GMT+08:00)",
+  "_from": "umax",
+  "_id": "umax@1.1.16",
+  "_inBundle": false,
+  "_integrity": "sha512-CwlvIW7+giPPeS0s9xQG/ublI5cw6gprq7HcQuBBJyBa5cW1JEzeUse14pqmSx49xk1j/aHGo3pUK/x/nXCsqg==",
+  "_location": "/umax",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "umax",
+    "name": "umax",
+    "escapedName": "umax",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/umax/-/umax-1.1.16.tgz",
+  "_shasum": "b1ee6c7838a84bcf8fe05ea2dc1cf5849c205809",
+  "_spec": "umax",
+  "_where": "D:\\temporary",
+  "author": {
+    "name": "UncleMao"
+  },
+  "bugs": {
+    "url": "https://github.com/ModernFarmer/umax/issues",
+    "email": "850558682@qq.com"
+  },
+  "bundleDependencies": false,
+  "deprecated": false,
+  "description": "ajax-Promise, 特别是能非常简单地操作文件上传, 模块还提供了文��压缩、文件转换等方法. Ajax-Promise, especially can be very simple operation file upload, the module also provides file compression, file conversion and other methods.",
+  "homepage": "https://github.com/ModernFarmer/umax#readme",
+  "keywords": [
+    "ajax",
+    "http",
+    "xmlhttprequest",
+    "promise",
+    "async",
+    "await"
+  ],
+  "license": "ISC",
+  "main": "index.js",
+  "name": "umax",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ModernFarmer/umax.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.1.16"
+}
