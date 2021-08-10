@@ -65,7 +65,7 @@ export const Umax = (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED
                 result.baseUrl = '';
             };
 
-            if(JSON.stringify(result) !== '{}')this[TEMPORARY] = result;
+            if(Object.keys(result).length)this[TEMPORARY] = result;
             return this;
         }
         get(url, json){
@@ -90,7 +90,7 @@ export const Umax = (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED
             return this[__REQUEST_SIMPLE](url, 'OPTIONS');
         }
         form(url, json){
-            if(!this[_CONFIG])throw ' -> umax对象未初始化, 请先执行.init()方法初始化ajax对象!';
+            if(!this[_CONFIG])throw ' -> umax对象未初始化, 请先执行.init()方法初始化umax对象!';
             return new Promise(async resolve => {
                 let {ajaxObj,trueConfig} = await this[BEFORE_OPEN]();
                 url = url.replace(/[\/\\]/g, '/').replace(/^\//, '');
@@ -144,7 +144,7 @@ export const Umax = (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED
             });
         }
         [__REQUEST_BODY](url, method, json){
-            if(!this[_CONFIG])throw ' -> umax对象未初始化, 请先执行.init()方法初始化ajax对象!';
+            if(!this[_CONFIG])throw ' -> umax对象未初始化, 请先执行.init()方法初始化umax对象!';
             return new Promise(async resolve => {
                 let {ajaxObj,trueConfig} = await this[BEFORE_OPEN]();
                 let dataObj = null;
@@ -173,7 +173,7 @@ export const Umax = (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED
             });
         }
         [__REQUEST_ENCODED](url, method, json){
-            if(!this[_CONFIG])throw ' -> umax对象未初始化, 请先执行.init()方法初始化ajax对象!';
+            if(!this[_CONFIG])throw ' -> umax对象未初始化, 请先执行.init()方法初始化umax对象!';
             return new Promise(async resolve => {
                 let {ajaxObj,trueConfig} = await this[BEFORE_OPEN]();
                 let dataObj = null;
@@ -198,6 +198,7 @@ export const Umax = (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED
             });
         }
         [__REQUEST_SIMPLE](url, method){
+            if(!this[_CONFIG])throw ' -> umax对象未初始化, 请先执行.init()方法初始化umax对象!';
             return new Promise(async resolve => {
                 let {ajaxObj,trueConfig} = await this[BEFORE_OPEN]();
                 url = url.replace(/[\/\\]/g, '/').replace(/^\//, '');
@@ -300,6 +301,7 @@ export const Umax = (function(_CONFIG, BEFORE_OPEN, BEFORE_SEND, READY_RESPONSED
                 if(this.responsed && typeof this.responsed === 'function'){
                     if(ajaxObj.responseType){
                         if(this._isJson(data)){
+                            // 这里深拷贝, umax.responsed() 方法不改变最终返回的数据
                             this.responsed(JSON.parse(JSON.stringify(data)), ajaxObj);
                         }else{
                             this.responsed(data, ajaxObj);
