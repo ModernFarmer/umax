@@ -89,25 +89,26 @@ umax._compress(json)  --- 压缩file, 返回promise
 **基础案例 :**
 ```javascript
 umax.init({ // .init()方法能接收的json有效字段有:baseUrl、timeout、ontimeout、onerror、responseType、headers、onprogress、user、password、withCredentials
-  baseUrl:'http://localhost:8080',  // 基础地址  默认''
-  timeout:10000,  // 最长响应时间(单位:ms)  默认0(无限)
-  ontimeout:function(xmlObj){  // 超过最长响应时间后执行的响应事件  默认null
+  baseUrl: 'http://localhost:8080',  // 基础地址  默认''
+  timeout: 10000,  // 最长响应时间(单位:ms)  默认0(无限)
+  ontimeout: function(xmlObj){  // 超过最长响应时间后执行的响应事件  默认null
     console.log(xmlObj.statusText)
   },
-  onerror:function(xmlObj){  // 超过网络异常后执行的响应事件  默认null
+  onerror: function(xmlObj){  // 网络异常后执行的响应事件  默认null
     console.log(xmlObj.statusText)
   },
-  responseType:'text',  // 设置接收类型  默认''
-  headers:{  // 设置headers  默认null
+  responseType: 'text',  // 设置接收类型  默认''
+  headers: {  // 设置headers  默认null
     connection:'keep-alive',
     Keep-Alive:'timeout=20, max=2',
     ...
   },
-  onprogress:function(e){  // 设置上传进度响应事件  默认null
+  onprogress: function(e){  // 设置上传进度响应事件  默认null
     console.log(e.loaded/e.total);  // e.loaded:当前已上传文件大小(单位:b), e.total:当前上传文件的总大小(单位:b)
   },
-  user:'userName',  // 设置服务器验证的user  默认null
-  password:'userPwd'  // 设置服务器验证的password  默认null
+  user: 'userName',  // 设置服务器验证的user  默认null
+  password: 'userPwd',  // 设置服务器验证的password  默认null
+  withCredentials: false  // 设置是否可跨域携带cookie [可选] 默认为false   *IE10+
 });
 
 
@@ -753,29 +754,30 @@ umax._compress(json)  --- To compressed file, return Promise
 **Based case :**
 ```javascript
 umax.init({ // The json valid fields that the .init() method can receive are:baseUrl、timeout、ontimeout、oerror、responseType、headers、onprogress、user、password、withCredentials
-  baseUrl:'http://localhost:8080',  // Base url  default ''
-  timeout:10000,  // Maximum response time(unit:ms)  default 0(infinite)
-  ontimeout:function(xmlObj){  // A response event executed after the maximum response time has been exceeded  default null
+  baseUrl: 'http://localhost:8080',  // Base url  default ''
+  timeout: 10000,  // Maximum response time(unit:ms)  default 0(infinite)
+  ontimeout: function(xmlObj){  // A response event executed after the maximum response time has been exceeded  default null
     console.log(xmlObj.statusText)
   },
-  onerror:function(xmlObj){  // A response event executed after network error  default null
+  onerror: function(xmlObj){  // A response event executed after network error  default null
     console.log(xmlObj.statusText)
   },
-  responseType:'text',  // Set receive type  default ''
-  headers:{  // Set headers  default null
+  responseType: 'text',  // Set receive type  default ''
+  headers: {  // Set headers  default null
     connection:'keep-alive',
     Keep-Alive:'timeout=20, max=2',
     ...
   },
-  onprogress:function(e){  // Set the upload progress response event  default null
+  onprogress: function(e){  // Set the upload progress response event  default null
     console.log(e.loaded/e.total);  // e.loaded:Currently uploaded file size(unit:b), e.total:The total size of the currently uploaded file(unit:b)
   },
-  user:'userName',  // Set 'user' for server validation  default null
-  password:'userPwd'  // Set 'password' for server authentication  default null
+  user: 'userName',  // Set 'user' for server validation  default null
+  password: 'userPwd',  // Set 'password' for server authentication  default null
+  withCredentials: false  // Sets whether cookies can be carried across domains [optional] default false    *IE10+
 });
 
 
-也可以:
+Can also be:
 
 umax.init();   // Default configuration, is equivalent to umax({baseUrl:''});
 ```
